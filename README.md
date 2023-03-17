@@ -6,3 +6,5 @@
 Printr is the fast, convenient and reliable 3D printing solution for Australia. Simply Upload your 3D file, make your preferences for filament, colour and pickup method and get your print as soon as it’s finished. 
 
 Our algorithm works to ensure your print times are reduced as much as possible, costing you less whilst making the best use of local printing resources.
+
+> Note: This is a mock project - Branding and advertising is not accurate, product is not intended for release.

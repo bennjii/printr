@@ -52,8 +52,8 @@ const Home: NextPage = () => {
                     </div>
                 </div>
 
-                <div className={`flex flex-col gap-2 flex-1 py-[32px]`}>
-                    <div className={`flex ${ expanded ? "flex-1 min-h-full h-full" : ""} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
+                <div className={`flex flex-col gap-2 flex-1 py-[32px] pb-0`}>
+                    <div className={`flex ${ expanded ? "flex-1 " : ""} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
                         <div className="cursor-pointer flex w-full bg-gray-100 px-4 py-2 rounded-md items-center gap-4" onClick={() => setExpanded(!expanded)}>
                             <div className="w-[14px] flex items-center justify-center">
                                 {
@@ -75,7 +75,7 @@ const Home: NextPage = () => {
                         <PrintStart expanded={expanded}/>
                     </div>
 
-                    <div className={`flex ${ !expanded ? "flex-1 min-h-full h-full" : ""} flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
+                    <div className={`flex ${ !expanded ? "flex-1 " : ""} flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
                         <div className="cursor-pointer flex w-full bg-gray-100 px-4 py-2 rounded-md items-center gap-4" onClick={() => setExpanded(!expanded)}>
                             <div className="w-[14px] flex items-center justify-center">
                                 {

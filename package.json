@@ -9,10 +9,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "mapbox-gl": "^2.13.0",
     "next": "^13.2.1",
     "next-auth": "^4.19.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-mapbox-gl": "^5.1.1",
     "zod": "^3.20.6"
   },
   "devDependencies": {

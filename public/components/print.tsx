@@ -222,8 +222,46 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                             <p className="text-gray-500">Please select from the following where wou would like to have your print printed.</p>
                                         </div>
 
-                                        <div className="flex flex-row items-start gap-2">
-                                            <div></div>
+                                        <div className="flex flex-row items-start gap-2 justify-between">
+                                            <div className="flex flex-col gap-2 items-start flex-1">
+                                                <div
+                                                    style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
+                                                    className="flex flex-row items-center gap-4 bg-gray-100 px-2 py-1 rounded-md w-full justify-between">
+                                                    <div className="flex flex-row items-center gap-2">
+                                                        <div className="h-4 w-4 rounded-full bg-green-400"></div>
+                                                        <p>Darlington Prints</p>
+                                                    </div>
+
+                                                    <p className="text-gray-600">0.5km</p>
+                                                    <a className="font-semibold cursor-pointer">Select</a>
+                                                </div
+>
+
+                                                <div
+                                                    style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
+                                                    className="flex flex-row items-center gap-4 bg-gray-100 px-2 py-1 rounded-md w-full justify-between">
+                                                    <div className="flex flex-row items-center gap-2">
+                                                        <div className="h-4 w-4 rounded-full bg-green-400"></div>
+                                                        <p>Central 3D Printers</p>
+                                                    </div>
+
+                                                    <p className="text-gray-600">0.9km</p>
+                                                    <a className="font-semibold cursor-pointer">Select</a>
+                                                </div
+>
+
+                                                <div
+                                                    style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
+                                                    className="flex flex-row items-center gap-4 bg-gray-100 px-2 py-1 rounded-md w-full justify-between">
+                                                    <div className="flex flex-row items-center gap-2">
+                                                        <div className="h-4 w-4 rounded-full bg-green-400"></div>
+                                                        <p>Jackson House 3D</p>
+                                                    </div>
+
+                                                    <p className="text-gray-600">1.25km</p>
+                                                    <a className="font-semibold cursor-pointer">Select</a>
+                                                </div>
+                                            </div>
                                             <Map />
                                         </div>
                                     </div>

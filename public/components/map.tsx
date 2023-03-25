@@ -4,8 +4,9 @@ import styles from '~/styles/pin.module.css'
 import "mapbox-gl/dist/mapbox-gl.css";
 import {createRef, useEffect, useState} from "react";
 
-import mapboxgl from "mapbox-gl";
+import mapboxgl, {LngLatLike, MapboxOptions} from "mapbox-gl";
 import {Constructor, from_latlon} from "../lib/printr";
+import * as process from "process";
 
 interface MapboxMapProps {
     initialOptions?: Omit<mapboxgl.MapboxOptions, "container">;
@@ -16,7 +17,7 @@ interface MapboxMapProps {
 
 export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructors }: MapboxMapProps) => {
     const [map, setMap] = useState<mapboxgl.Map>();
-    const mapNode = createRef();
+    const mapNode = createRef<HTMLDivElement>();
 
     useEffect(() => {
         const node = mapNode.current;
@@ -26,7 +27,6 @@ export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructo
         if (typeof window === "undefined" || node === null) return;
 
         // otherwise, create a map instance
-        //@ts-ignore
         const mapboxMap = new mapboxgl.Map({
             container: node,
             accessToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
@@ -34,12 +34,12 @@ export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructo
             center: [151.186344, -33.888437],
             zoom: 11,
             ...initialOptions,
-        });
+        } as MapboxOptions);
 
         setMap(mapboxMap);
 
         constructors.map(c => {
-            new mapboxgl.Marker().setLngLat(from_latlon(c.location)).addTo(mapboxMap);
+            new mapboxgl.Marker().setLngLat(from_latlon(c.location) as LngLatLike).addTo(mapboxMap);
         })
 
         // if onMapLoaded is specified it will be called once

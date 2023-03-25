@@ -405,7 +405,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
 
                             setPrintMode(0);
                         }else {
-                            setPrintMode(print_mode > 4 ? 5 : (print_mode == 1 && config.delivery.method != "Delivery") ? 3 : can_continue ? print_mode+1 : print_mode as typeof print_mode)
+                            setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 3 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
                         }
                     }}>
                     <p className="select-none">{ print_mode == CONFIRM_PRINT_MODE ? "Place Order" : print_mode == CONFIRM_PRINT_MODE+1 ? "Restart" : "Continue" }</p>

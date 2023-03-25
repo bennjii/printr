@@ -17,8 +17,8 @@ export type LatLon = {
 
 export const to_latlon = (input: number[]): LatLon =>  {
     return {
-        lattitude: input[0],
-        longitude: input[1]
+        lattitude: input[0]!,
+        longitude: input[1]!
     }
 }
 

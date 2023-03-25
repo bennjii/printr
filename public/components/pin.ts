@@ -4,7 +4,7 @@ export const svg = `<?xml version="1.0" encoding="UTF-8"?>
     <title>Cycle_Hire_Logo</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
         <g id="Cycle_Hire_Logo">
             <rect id="rect17" x="0" y="6.22699387" width="20" height="4.38650307"></rect>
             <path d="M18.2515337,8.38957234 C18.2515337,13.0228585 14.5436104,16.7791411 9.96961789,16.7791411 C5.39562517,16.7791411 1.68711656,13.0228585 1.68711656,8.38957234 C1.68711656,3.75598996 5.39562517,0 9.96961789,0 C14.5436104,0 18.2515337,3.75569357 18.2515337,8.38957234" id="path19"></path>

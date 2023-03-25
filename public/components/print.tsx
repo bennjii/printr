@@ -5,7 +5,7 @@ import { type PrintConfig } from "../lib/printr";
 import { Map } from './map'
 
 export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
-    const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 3 | 4>(0);
+    const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 3 | 4>(3);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
 
@@ -86,33 +86,37 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                             <p className="text-gray-500">Choose your desired colour, filament and method of delivery</p>
                                             <br />
 
-                                            <div className="flex flex-col gap-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-                                                <div className="flex flex-row items-center gap-2">
-                                                    <div className="bg-gray-200 px-2 rounded-md">
-                                                        File(s):
+                                            <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                        <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                            File(s):
+                                                        </div>
+                                                        {config.files.map(k => k[0]?.name).join(', ')}
                                                     </div>
-                                                    {config.files.map(k => k[0]?.name).join(', ')}
+
+                                                    <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                        <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                            Colour:
+                                                        </div>
+                                                        {config.colour.name}
+                                                    </div>
                                                 </div>
 
-                                                <div className="flex flex-row items-center gap-2">
-                                                    <div className="bg-gray-200 px-2 rounded-md">
-                                                        Colour:
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                        <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                            Filament:
+                                                        </div>
+                                                        {config.filament.name}
                                                     </div>
-                                                    {config.colour.name}
-                                                </div>
 
-                                                <div className="flex flex-row items-center gap-2">
-                                                    <div className="bg-gray-200 px-2 rounded-md">
-                                                        Filament:
+                                                    <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                        <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                            Prefered Method:
+                                                        </div>
+                                                        {config.delivery.method}
                                                     </div>
-                                                    {config.filament.name}
-                                                </div>
-
-                                                <div className="flex flex-row items-center gap-2">
-                                                    <div className="bg-gray-200 px-2 rounded-md">
-                                                        Prefered Method:
-                                                    </div>
-                                                    {config.delivery.method}
                                                 </div>
                                             </div>
                                         </div>
@@ -222,7 +226,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                             <p className="text-gray-500">Please select from the following where wou would like to have your print printed.</p>
                                         </div>
 
-                                        <div className="flex flex-row items-start gap-2 justify-between">
+                                        <div className="flex flex-row items-start gap-2 justify-between flex-1 h-full">
                                             <div className="flex flex-col gap-2 items-start flex-1">
                                                 <div
                                                     style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
@@ -262,6 +266,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                                     <a className="font-semibold cursor-pointer">Select</a>
                                                 </div>
                                             </div>
+
                                             <Map />
                                         </div>
                                     </div>
@@ -285,7 +290,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                 <div className={`flex flex-row items-center gap-2 cursor-pointer bg-gray-100 px-2 py-1 rounded-md ${print_mode <= 0 ? "opacity-20" : ""}`}
                     onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 3 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
 
                     <p className="select-none">Back</p>
@@ -296,7 +301,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                     <p className="select-none">Continue</p>
 
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                 </div>
             </div>

@@ -29,6 +29,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@types/eslint", "npm:8.21.3"],\
+            ["@types/mapbox-gl", "npm:2.7.10"],\
             ["@types/node", "npm:18.15.5"],\
             ["@types/prettier", "npm:2.7.2"],\
             ["@types/react", "npm:18.0.28"],\
@@ -563,6 +564,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-json5-npm-0.0.29-f63a7916bd-e60b153664.zip/node_modules/@types/json5/",\
           "packageDependencies": [\
             ["@types/json5", "npm:0.0.29"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/mapbox-gl", [\
+        ["npm:2.7.10", {\
+          "packageLocation": "./.yarn/cache/@types-mapbox-gl-npm-2.7.10-cf0a33a224-0ee433fa75.zip/node_modules/@types/mapbox-gl/",\
+          "packageDependencies": [\
+            ["@types/mapbox-gl", "npm:2.7.10"],\
+            ["@types/geojson", "npm:7946.0.10"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4372,6 +4383,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["printr", "workspace:."],\
             ["@types/eslint", "npm:8.21.3"],\
+            ["@types/mapbox-gl", "npm:2.7.10"],\
             ["@types/node", "npm:18.15.5"],\
             ["@types/prettier", "npm:2.7.2"],\
             ["@types/react", "npm:18.0.28"],\
@@ -4544,7 +4556,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-mapbox-gl", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:5.1.1"],\
             ["@turf/bbox", "npm:4.7.3"],\
             ["@turf/helpers", "npm:4.7.3"],\
-            ["@types/mapbox-gl", null],\
+            ["@types/mapbox-gl", "npm:2.7.10"],\
             ["@types/prop-types", null],\
             ["@types/react", "npm:18.0.28"],\
             ["@types/react-dom", "npm:18.0.11"],\

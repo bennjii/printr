@@ -410,6 +410,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mapbox-gl@npm:^2.7.10":
+  version: 2.7.10
+  resolution: "@types/mapbox-gl@npm:2.7.10"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: 0ee433fa7510733fd7744796d8b04c9bbc6e087a3b46a114433528bd7f64b2b475a245bda3598d7cd1db5a9cf5ea93567d234594b7cd3106d32b0c9cbe333888
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^18.14.0":
   version: 18.15.5
   resolution: "@types/node@npm:18.15.5"
@@ -3541,6 +3550,7 @@ __metadata:
   resolution: "printr@workspace:."
   dependencies:
     "@types/eslint": ^8.21.1
+    "@types/mapbox-gl": ^2.7.10
     "@types/node": ^18.14.0
     "@types/prettier": ^2.7.2
     "@types/react": ^18.0.28

@@ -7,10 +7,13 @@ import { PrintStart } from "../../public/components/print";
 //<div className="bg-gray-900 px-4 py-2 rounded-lg text-white">Start Printing</div>
 
 const Home: NextPage = () => {
-    const [ expanded, setExpanded ] = useState(false);
+    const [ expanded, setExpanded ] = useState(true);
 
     return (
         <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
+            <title>Printr</title>
+            <link rel="icon" href="/favicon.ico" />
+
             <div className="flex flex-row items-center justify-between w-full min-w-screen px-8 py-4">
                 <p className="font-bold text-lg">printr</p>
                 {/* <Image src="/img/light_logo.png" alt="" height={69.5} width={200}></Image> */}
@@ -59,11 +62,11 @@ const Home: NextPage = () => {
                                 {
                                     expanded ?
                                         <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L7 7L13 1" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
                                     :
                                         <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 13L7 7L1 1" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
 
                                 }
@@ -81,11 +84,11 @@ const Home: NextPage = () => {
                                 {
                                      !expanded ?
                                         <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L7 7L13 1" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
                                     :
                                         <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 13L7 7L1 1" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
 
                                 }

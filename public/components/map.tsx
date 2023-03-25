@@ -5,18 +5,16 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import {createRef, useEffect, useState} from "react";
 
 import mapboxgl from "mapbox-gl";
+import {Constructor, from_latlon} from "../lib/printr";
 
 interface MapboxMapProps {
     initialOptions?: Omit<mapboxgl.MapboxOptions, "container">;
     onMapLoaded?(map: mapboxgl.Map): void;
     onMapRemoved?(): void;
+    constructors: Constructor[]
 }
 
-export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved }: MapboxMapProps) => {
-//    const MBMap = ReactMapboxGl({
-//        accessToken: 'pk.eyJ1IjoiYmVud2hpdGUyMiIsImEiOiJjbGZrcjNxc3IwZGp6M3VzN2FrMWwycWF6In0.7l7xKqrAsg237rv8FzdplA',
-//    });
-
+export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructors }: MapboxMapProps) => {
     const [map, setMap] = useState<mapboxgl.Map>();
     const mapNode = createRef();
 
@@ -28,6 +26,7 @@ export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved }: MapboxMa
         if (typeof window === "undefined" || node === null) return;
 
         // otherwise, create a map instance
+        //@ts-ignore
         const mapboxMap = new mapboxgl.Map({
             container: node,
             accessToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
@@ -39,7 +38,9 @@ export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved }: MapboxMa
 
         setMap(mapboxMap);
 
-        new mapboxgl.Marker().setLngLat([151.186344, -33.888437]).addTo(mapboxMap);
+        constructors.map(c => {
+            new mapboxgl.Marker().setLngLat(from_latlon(c.location)).addTo(mapboxMap);
+        })
 
         // if onMapLoaded is specified it will be called once
         // by "load" map event

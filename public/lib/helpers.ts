@@ -1,10 +1,13 @@
-import { type Colour, DeliveryMethod, type Filament } from "./printr";
+import {type Colour, Completeness, Constructor, DeliveryMethod, type Filament, to_latlon} from "./printr";
+
+export const CONFIRM_PRINT_MODE = 4;
 
 export function getSize(size: string, dp?: number): string {
     const sizes = [' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB'];
 
     for (let i = 1; i < sizes.length; i++) {
         if (parseFloat(size) < Math.pow(1000, i))
+            //@ts-ignore
             return (parseFloat(size) / Math.pow(1000, i - 1)).toFixed(dp !== null ? dp : 2).toString() + sizes[i - 1];
     }
 
@@ -110,3 +113,33 @@ export const COLOUR_OPTIONS: Colour[] = [
         code: "AYEL"
     },
 ];
+
+export const FIXED_PRINTER_OPTIONS: Constructor[] = [
+    {
+        name: "Darlington Prints",
+        location: to_latlon([151.186344, -33.888437]),
+        completeness_level: Completeness.Absolute,
+        id: "q39h29j21w0918h81g"
+    },
+    {
+        name: "Central 3D Printers",
+        location: to_latlon([151.2069986455657, -33.863668189634026]),
+        completeness_level: Completeness.Absolute,
+        id: "bnja991gb910tub2ag"
+    },
+    {
+        name: "Jackson House 3D",
+        location: to_latlon([151.16657477539488, -33.88951988211027]),
+        completeness_level: Completeness.Partial,
+        id: "g240b40t2083g49293"
+    }
+];
+
+export const DEFAULT_CONFIG = {
+    colour: COLOUR_OPTIONS[0]!,
+    filament: FILAMENT_OPTIONS[0]!,
+    delivery: DELIVERY_OPTIONS[0]!,
+    files: [],
+    constructor: null,
+    DANGEROUS_PREFERS_NO_CHECKS: false
+}

@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobStatus {
+  DRAFT
+  BIDDING
+  PREPRINT
+  PRINTING
+  PREDELIVERY
+  ENROUTE
+  COMPLETE
+  CANCELED
+}
+
+enum PrinterStatus {
+  IDLE
+  PRINTING
+  UNAVALIABLE
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  hash           String
+  is_constructor Boolean
+  location       String
+  Constructor    Constructor?
+  JobMetadata    JobMetadata?
+  BidMetadata    BidMetadata[]
+}
+
+model Constructor {
+  id   String @id @default(cuid())
+  name String
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  owner_id String @unique
+  owner    User   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+
+  location        String
+  PrinterMetadata PrinterMetadata[]
+  JobMetadata     JobMetadata[]
+}
+
+model Printer {
+  id    String @id @default(cuid())
+  model String
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  current_status  PrinterStatus    @default(IDLE)
+  PrinterMetadata PrinterMetadata?
+  JobMetadata     JobMetadata[]
+}
+
+model PrinterMetadata {
+  printer    Printer @relation(fields: [printer_id], references: [id], onDelete: Cascade)
+  printer_id String  @unique
+
+  constructor    Constructor @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
+  constructor_id String
+}
+
+model Job {
+  id String @id @default(cuid())
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  current_status JobStatus     @default(DRAFT)
+  status_history Json
+  file_url       String
+  JobMetadata    JobMetadata?
+  BidMetadata    BidMetadata[]
+}
+
+model JobMetadata {
+  job    Job    @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  job_id String @unique
+
+  constructor    Constructor @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
+  constructor_id String
+
+  printer    Printer @relation(fields: [printer_id], references: [id], onDelete: Cascade)
+  printer_id String
+
+  submitter    User   @relation(fields: [submitter_id], references: [id], onDelete: Cascade)
+  submitter_id String @unique
+}
+
+model Bid {
+  id String @id @default(cuid())
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  price       Int
+  BidMetadata BidMetadata?
+}
+
+model BidMetadata {
+  job    Job    @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  job_id String
+
+  bid    Bid    @relation(fields: [bid_id], references: [id], onDelete: Cascade)
+  bid_id String @unique
+
+  bidder    User   @relation(fields: [bidder_id], references: [id], onDelete: Cascade)
+  bidder_id String
+}

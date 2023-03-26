@@ -45,6 +45,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss", "npm:8.4.21"],\
             ["prettier", "npm:2.8.6"],\
             ["prettier-plugin-tailwindcss", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:0.2.5"],\
+            ["prisma", "npm:4.11.0"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:18.2.0"],\
             ["react-mapbox-gl", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:5.1.1"],\
@@ -461,6 +462,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["picocolors", "npm:1.0.0"],\
             ["tiny-glob", "npm:0.2.9"],\
             ["tslib", "npm:2.5.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@prisma/engines", [\
+        ["npm:4.11.0", {\
+          "packageLocation": "./.yarn/unplugged/@prisma-engines-npm-4.11.0-9458416c54/node_modules/@prisma/engines/",\
+          "packageDependencies": [\
+            ["@prisma/engines", "npm:4.11.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4399,6 +4409,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss", "npm:8.4.21"],\
             ["prettier", "npm:2.8.6"],\
             ["prettier-plugin-tailwindcss", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:0.2.5"],\
+            ["prisma", "npm:4.11.0"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:18.2.0"],\
             ["react-mapbox-gl", "virtual:ecd5783ba17e2edb489218165be31801cb888b2b97854c842e1c80b5aed8b6bf1b011c0684530bc10008ad34c3f4788fcb3e63f35d19e3e8426ab8d81c854f11#npm:5.1.1"],\
@@ -4407,6 +4418,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["zod", "npm:3.21.4"]\
           ],\
           "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["prisma", [\
+        ["npm:4.11.0", {\
+          "packageLocation": "./.yarn/unplugged/prisma-npm-4.11.0-5f8635d1be/node_modules/prisma/",\
+          "packageDependencies": [\
+            ["prisma", "npm:4.11.0"],\
+            ["@prisma/engines", "npm:4.11.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["promise-inflight", [\

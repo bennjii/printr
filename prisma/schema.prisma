@@ -87,6 +87,7 @@ model Job {
   current_status JobStatus     @default(DRAFT)
   status_history Json
   file_url       String
+  job_name      String
   JobMetadata    JobMetadata?
   BidMetadata    BidMetadata[]
 }

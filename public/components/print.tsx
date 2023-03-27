@@ -341,7 +341,7 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                         </div>
                                     </div>
                                 </div>
-                                )
+                            )
                     case 6:
                         return (
                                 <div className="flex flex-col gap-4 flex-1 p-12 flex-1">

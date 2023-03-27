@@ -1,4 +1,13 @@
-import {type Colour, Completeness, Constructor, DeliveryMethod, type Filament, to_latlon} from "./printr";
+import {
+    type Colour,
+    Completeness,
+    Constructor,
+    DeliveryMethod,
+    type Filament,
+    Job,
+    JobStatus,
+    to_latlon
+} from "./printr";
 
 export const CONFIRM_PRINT_MODE = 4;
 
@@ -144,4 +153,80 @@ export const DEFAULT_CONFIG = {
     DANGEROUS_PREFERS_NO_CHECKS: false
 }
 
-export const DEFAULT_PRINT_JOBS: PrintJobs[] = []
+export const DEFAULT_PRINT_JOBS: Job[] = [
+    {
+        id: "abnauneoan",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+        estimated_completion: "32 minutes",
+
+        current_status: JobStatus.DRAFT,
+        status_history: [],
+
+        file_url: "sundial_print.obj",
+        job_name: "Sundial",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    },
+    {
+        id: "ngoi101je01",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+
+        current_status: JobStatus.PRINTING,
+        status_history: [],
+        estimated_completion: "32 minutes",
+
+        file_url: "clock_hands.obj",
+        job_name: "Clock Hands",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    },
+    {
+        id: "v1ijn0e8012n",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+
+        current_status: JobStatus.COMPLETE,
+        status_history: [],
+        estimated_completion: "32 minutes",
+
+        file_url: "nose_cone.obj",
+        job_name: "Nose Cone",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    }
+]

@@ -72,8 +72,12 @@ export type Job = {
 
     current_status: JobStatus,
     status_history: History<JobStatus>[],
+    estimated_completion: String,
 
-    file_url: String
+    job_preferences: PrintConfig
+
+    file_url: String,
+    job_name: String
 }
 
 export type Bid = {

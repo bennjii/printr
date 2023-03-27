@@ -30,7 +30,10 @@ const Home: NextPage = () => {
                 <div className="flex flex-1 flex-col gap-2 min-w-[300px] max-w-[300px]">
                     <p className="text-gray-600">Current Prints</p>
                      {/* All of the prints in queue */}
-                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md">
+                    {
+                        
+                    }
+                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer">
                         <div className="bg-green-400 h-[20px] w-[20px] rounded-full"></div>
                         <div className="">
                             <p className="font-bold">Sundial</p>
@@ -38,7 +41,7 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md">
+                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer">
                         <div className="bg-green-400 h-[20px] w-[20px] rounded-full"></div>
                         <div className="">
                             <p className="font-bold">Clock Hands</p>
@@ -46,7 +49,7 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md">
+                    <div className="flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer">
                         <div className="bg-blue-400 h-[20px] w-[20px] rounded-full"></div>
                         <div className="flex flex-col gap-0">
                             <p className="font-bold">Nose Cone</p>
@@ -75,7 +78,7 @@ const Home: NextPage = () => {
                             <p className="select-none font-semibold">Print Now</p>
                         </div>
 
-                        <PrintStart expanded={expanded}/>
+                        <PrintStart expanded={expanded} setExpanded={setExpanded}/>
                     </div>
 
                     <div className={`flex ${ !expanded ? "flex-1 " : ""} flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>

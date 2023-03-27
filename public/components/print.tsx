@@ -17,8 +17,8 @@ import {
 } from "../lib/printr";
 import {Map} from './map'
 
-export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
-    const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
+export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setExpanded: Function }) => {
+    const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
 
@@ -230,45 +230,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                     </div>
                                 </div>
                                 )
-                    case 3:
-                        return (
-                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
-                                    <div className="flex justify-start flex-col gap-4 place-start flex-1" >
-                                        <div className="flex flex-col">
-                                            <p className="font-bold text-xl">Pick Printer</p>
-                                            <p className="text-gray-500">Please select from the following where wou would like to have your print printed.</p>
-                                        </div>
 
-                                        <div className="flex flex-row items-start gap-2 justify-between flex-1 h-full" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-                                            <div className="flex flex-col gap-2 items-start flex-1">
-                                                {
-                                                    FIXED_PRINTER_OPTIONS.map((constr: Constructor) => {
-                                                        return (
-                                                                <div
-                                                                    key={constr.id}
-                                                                    style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
-                                                                    className="flex flex-row items-center gap-4 bg-gray-100 px-2 py-1 rounded-md w-full justify-between">
-                                                                    <div className="flex flex-row items-center gap-2">
-                                                                        <div className={`h-4 w-4 rounded-full ${constr.completeness_level == Completeness.Absolute ? "bg-green-400" : "bg-orange-400"}`}></div>
-                                                                        <p>{constr.name}</p>
-                                                                    </div>
-
-                                                                    <p className="text-gray-600">1.25km</p>
-                                                                    <a className="font-semibold cursor-pointer" onClick={() => {
-                                                                        setConfig({ ...config, constructor: constr });
-                                                                        setCanContinue(true);
-                                                                    }}>Select</a>
-                                                                </div>
-                                                                )
-                                                    })
-                                                }
-                                            </div>
-
-                                            <Map constructors={FIXED_PRINTER_OPTIONS} />
-                                        </div>
-                                    </div>
-                                </div>
-                                )
                     case 4:
                         return (
                                 <div className="flex flex-col gap-8 flex-1 p-12 flex-1 flex-start">
@@ -317,6 +279,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                             </div>
                                         </div>
 
+                                        {/*
                                         <div className="flex flex-col gap-2">
                                             <p className="font-semibold text-sm uppercase">Constructor</p>
                                             <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
@@ -352,7 +315,9 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>*/}
+
+                                        <p className="text-gray-500">Following placing your order, you will be notified when a constructor accepts your print</p>
                                     </div>
                                 </div>
                                 )
@@ -366,7 +331,52 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
                                         </div>
 
                                         <div>
-                                            ...
+                                            <div className="bg-gray-100 px-2 py-1 rounded-md w-fit flex flex-row items-center gap-2" onClick={() => setExpanded(false)}>
+                                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M13 1L1 13M1 1L13 13" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+
+                                                <p>Close this window</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                )
+                    case 6:
+                        return (
+                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
+                                    <div className="flex justify-start flex-col gap-4 place-start flex-1" >
+                                        <div className="flex flex-col">
+                                            <p className="font-bold text-xl">Pick Printer</p>
+                                            <p className="text-gray-500">Please select from the following where wou would like to have your print printed.</p>
+                                        </div>
+
+                                        <div className="flex flex-row items-start gap-2 justify-between flex-1 h-full" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                            <div className="flex flex-col gap-2 items-start flex-1">
+                                                {
+                                                    FIXED_PRINTER_OPTIONS.map((constr: Constructor) => {
+                                                        return (
+                                                                <div
+                                                                    key={constr.id}
+                                                                    style={{ display: "grid", gridTemplateColumns: "1fr 50px 50px" }}
+                                                                    className="flex flex-row items-center gap-4 bg-gray-100 px-2 py-1 rounded-md w-full justify-between">
+                                                                    <div className="flex flex-row items-center gap-2">
+                                                                        <div className={`h-4 w-4 rounded-full ${constr.completeness_level == Completeness.Absolute ? "bg-green-400" : "bg-orange-400"}`}></div>
+                                                                        <p>{constr.name}</p>
+                                                                    </div>
+
+                                                                    <p className="text-gray-600">1.25km</p>
+                                                                    <a className="font-semibold cursor-pointer" onClick={() => {
+                                                                        setConfig({ ...config, constructor: constr });
+                                                                        setCanContinue(true);
+                                                                    }}>Select</a>
+                                                                </div>
+                                                                )
+                                                    })
+                                                }
+                                            </div>
+
+                                            <Map constructors={FIXED_PRINTER_OPTIONS} />
                                         </div>
                                     </div>
                                 </div>
@@ -387,7 +397,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
 
                 <div className="flex flex-row items-center justify-between p-8">
                     <div className={`flex flex-row items-center gap-2 cursor-pointer bg-gray-100 px-2 py-1 rounded-md ${print_mode <= 0 ? "opacity-20" : ""} ${print_mode == 5 ? "hidden" : ""}`}
-                        onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 3 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
+                        onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 3 && config.delivery.method != "Delivery") ? 1 : (print_mode == 4 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -405,7 +415,7 @@ export const PrintStart = ({ expanded }:  { expanded: boolean }) => {
 
                             setPrintMode(0);
                         }else {
-                            setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 3 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
+                            setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
                         }
                     }}>
                     <p className="select-none">{ print_mode == CONFIRM_PRINT_MODE ? "Place Order" : print_mode == CONFIRM_PRINT_MODE+1 ? "Restart" : "Continue" }</p>

@@ -143,3 +143,5 @@ export const DEFAULT_CONFIG = {
     constructor: null,
     DANGEROUS_PREFERS_NO_CHECKS: false
 }
+
+export const DEFAULT_PRINT_JOBS: PrintJobs[] = []

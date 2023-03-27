@@ -1,3 +1,18 @@
+export enum JobStatus {
+    DRAFT, BIDDING, PREPRINT,
+    PRINTING, PREDELIVERY, ENROUTE,
+    COMPLETE, CANCELED
+}
+
+export enum PrinterStatus {
+    IDLE, PRINTING, UNAVALIABLE
+}
+
+export type History<T> = {
+    value: T,
+    timestamp: String
+}
+
 export type Colour = {
     name: string,
     primary_hex: string,
@@ -13,6 +28,61 @@ export type Filament = {
 export type LatLon = {
     lattitude: number,
     longitude: number
+}
+
+export type User = {
+    id: String,
+    email: String,
+    name: String,
+
+    created_at: String,
+    updated_at: String,
+
+    hash: String,
+    is_constructor: boolean,
+    location: String,
+}
+
+export type Constructor = {
+    id: String,
+    name: String,
+
+    created_at: String,
+    updated_at: String,
+
+    owner_id: String,
+    location: String
+}
+
+export type Printer = {
+    id: String,
+    model: String,
+
+    created_at: String,
+    updated_at: String,
+
+    current_status: PrinterStatus
+}
+
+export type Job = {
+    id: String,
+
+    created_at: String,
+    updated_at: String,
+
+    current_status: JobStatus,
+    status_history: History<JobStatus>[],
+
+    file_url: String
+}
+
+export type Bid = {
+    id: String,
+
+    created_at: String,
+    updated_at: String,
+
+    price: number
 }
 
 export const to_latlon = (input: number[]): LatLon =>  {

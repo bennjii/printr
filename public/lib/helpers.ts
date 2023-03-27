@@ -5,8 +5,8 @@ import {
     DeliveryMethod,
     type Filament,
     Job,
-    JobStatus,
-    to_latlon
+    JobStatus, MinifiedConstructor,
+    to_latlon, User
 } from "./printr";
 
 export const CONFIRM_PRINT_MODE = 4;
@@ -123,7 +123,7 @@ export const COLOUR_OPTIONS: Colour[] = [
     },
 ];
 
-export const FIXED_PRINTER_OPTIONS: Constructor[] = [
+export const FIXED_PRINTER_OPTIONS: MinifiedConstructor[] = [
     {
         name: "Darlington Prints",
         location: to_latlon([151.186344, -33.888437]),
@@ -165,6 +165,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         status_history: [],
 
         file_url: "sundial_print.obj",
+        file_name: "sundial_print.obj",
         job_name: "Sundial",
 
         job_preferences: {
@@ -189,8 +190,9 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         status_history: [],
         estimated_completion: "32 minutes",
 
-        file_url: "clock_hands.obj",
         job_name: "Clock Hands",
+        file_url: "clock_hands.obj",
+        file_name: "clock_hands.obj",
 
         job_preferences: {
             colour: COLOUR_OPTIONS[0],
@@ -215,6 +217,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         estimated_completion: "32 minutes",
 
         file_url: "nose_cone.obj",
+        file_name: "nose_cone.obj",
         job_name: "Nose Cone",
 
         job_preferences: {
@@ -230,3 +233,16 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     }
 ]
+
+export const DEFAULT_USER: User = {
+    id: "",
+    email: "ben@bennjii.dev",
+    name: "Ben White",
+
+    created_at: new Date().getUTCDate().toString(),
+    updated_at: new Date().getUTCDate().toString(),
+
+    hash: "ABCDEFG",
+    is_constructor: false,
+    location: "Sydney, NSW",
+}

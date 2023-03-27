@@ -1,14 +1,29 @@
 import {type NextPage} from "next";
 import Image from "next/image";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
-import {DEFAULT_PRINT_JOBS} from "../../public/lib/helpers";
-import {JobStatus} from "../../public/lib/printr";
+import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
+import {Job, JobStatus} from "../../public/lib/printr";
 //<div className="bg-gray-900 px-4 py-2 rounded-lg text-white">Start Printing</div>
 
 const Home: NextPage = () => {
     const [ expanded, setExpanded ] = useState(true);
+
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
+    const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
+
+    const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+    const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+
+    useEffect(() => {
+        let diff = rawPrintList.filter(element => !printList.includes(element));
+
+        if(diff.length > 0) {
+            setActivePrint(diff[0])
+        }
+
+        setPrintList([ ...rawPrintList.sort((a, b) => a.current_status - b.current_status) ])
+    }, [rawPrintList]);
 
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
@@ -16,13 +31,15 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico" />
 
                 <div className="flex flex-row items-center justify-between w-full min-w-screen px-8 py-4">
-                    <p className="font-bold text-lg">printr</p>
-                    {/* <Image src="/img/light_logo.png" alt="" height={69.5} width={200}></Image> */}
+                    <div className="flex flex-row items-center gap-2">
+                        <Image src="favicon.svg" alt="" height={28} width={28}></Image>
+                        <p className="font-bold text-xl">printr</p>
+                    </div>
 
                     <p></p>
 
                     <div className="flex flex-row items-center gap-4">
-                        <p>Ben White</p>
+                        <p>{activeUser.name}</p>
                         <Image src="/img/user_icons/blurple.svg" alt="" height={35} width={35}></Image>
                     </div>
                 </div>
@@ -30,27 +47,27 @@ const Home: NextPage = () => {
                 <div className="flex flex-row flex-1 w-full p-8 gap-8">
                     <div className="flex flex-1 flex-col gap-2 min-w-[300px] max-w-[300px]">
                         <p className="text-gray-600">Current Prints</p>
+
                         {/* All of the prints in queue */}
                         {
-                        DEFAULT_PRINT_JOBS.map(k => {
-                            return (
+                            printList.map(k => {
+                                return (
                                     <div
                                         onClick={() => {
-                                        setExpanded(false)
+                                            setExpanded(false)
                                             setActivePrint(k)
-                                    }}
+                                        }}
                                         key={k.id}
-                                        className={`flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer ${k.current_status == JobStatus.COMPLETE ? "opacity-40" : ""}`}>
+                                        className={`flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer ${k.current_status == JobStatus.COMPLETE || k.current_status == JobStatus.CANCELED || k.current_status == JobStatus.DRAFT ? "opacity-40" : ""}`}>
                                         <div className={`${k.current_status == JobStatus.PRINTING ? "bg-green-400" : k.current_status == JobStatus.BIDDING ? "bg-orange-400" : k.current_status == JobStatus.CANCELED ? "bg-red-400" : k.current_status == JobStatus.ENROUTE ? "" : k.current_status == JobStatus.PREPRINT ? "bg-yellow-400" : k.current_status == JobStatus.COMPLETE ? "bg-green-400" : k.current_status == JobStatus.DRAFT ? "bg-orange-400" : k.current_status == JobStatus.PREDELIVERY ? "bg-gray-400" : "bg-gray-400"} h-[20px] w-[20px] rounded-full`}></div>
                                         <div className="">
                                             <p className="font-bold">{k.job_name}</p>
                                             <p className="text-gray-600">{k.current_status == JobStatus.PRINTING ? `${k.estimated_completion} Remaining` : k.current_status == JobStatus.BIDDING ? "Bidding" : k.current_status == JobStatus.CANCELED ? "Canceled" : k.current_status == JobStatus.DRAFT ? "Draft" : k.current_status == JobStatus.ENROUTE ? "En Route" : k.current_status == JobStatus.PREPRINT ? "Preparing to print" : "" }</p>
                                         </div>
-                                    </div
-                                        >
-                                        )
-                        })
-                    }
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
 
                     <div className={`flex flex-col gap-2 flex-1 py-[32px] pb-0`}>
@@ -73,32 +90,36 @@ const Home: NextPage = () => {
                                 <p className="select-none font-semibold">Print Now</p>
                             </div>
 
-                            <PrintStart expanded={expanded} setExpanded={setExpanded}/>
+                            <PrintStart
+                                expanded={expanded} setExpanded={setExpanded}
+                                printList={rawPrintList} setPrintList={setRawPrintList}
+                                />
                         </div>
 
-                        <div className={`flex ${ expanded ? "flex-1" : "h-fit"} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
+                        <div className={`flex ${ !expanded ? "flex-1" : ""} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
                             <div className="cursor-pointer flex w-full bg-gray-100 px-4 py-2 rounded-md items-center gap-4" onClick={() => setExpanded(!expanded)}>
-                                <div className="w-[14px] flex items-center justify-center">
-                                    {
-                                     !expanded ?
-                                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    :
-                                        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
+                            <div className="w-[14px] flex items-center justify-center">
+                                {
+                                 !expanded ?
+                                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                :
+                                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
 
-                                }
-                                </div>
-                                <p className="select-none font-semibold">{activePrint.job_name}</p>
+                            }
                             </div>
+                            <p className="select-none font-semibold">{activePrint.job_name}</p>
+                        </div>
 
-                            <div className={`flex-col gap-4 p-12 ${!expanded ? "flex flex-1" : "none hidden"}`}>
-                                <div className="flex justify-start flex-col gap-4 place-start flex-1" >
+                        <div className={`${!expanded ? "flex" : "none hidden"} flex-col flex-1`}>
+                            <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
+                                <div className="flex justify-start flex-col gap-4 place-start" >
                                     <div className="flex flex-col">
                                         <p className="font-bold text-xl">{activePrint.job_name}</p>
-                                        <p className="text-gray-500">{activePrint.file_url}</p>
+                                        <p className="text-gray-500">{activePrint.file_name}</p>
                                     </div>
                                 </div>
 
@@ -140,16 +161,17 @@ const Home: NextPage = () => {
                                     switch(activePrint.current_status) {
                                         case JobStatus.DRAFT:
                                             return (
-                                                <div>
+                                                    <div>
 
-                                                </div>
-                                            )
+                                                    </div>
+                                                    )
                                         default:
                                             return (<></>)
                                     }
                                 })()}
 
-                            <p>{activePrint.status_history.map(k => {})}</p>
+                                 <p>{activePrint.status_history.map(k => {})}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

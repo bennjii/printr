@@ -1,7 +1,8 @@
 export enum JobStatus {
-    DRAFT, BIDDING, PREPRINT,
+    BIDDING, PREPRINT,
     PRINTING, PREDELIVERY, ENROUTE,
-    COMPLETE, CANCELED
+    
+    COMPLETE, CANCELED, DRAFT
 }
 
 export enum PrinterStatus {
@@ -72,11 +73,12 @@ export type Job = {
 
     current_status: JobStatus,
     status_history: History<JobStatus>[],
-    estimated_completion: String,
+    estimated_completion: String | null,
 
     job_preferences: PrintConfig
 
     file_url: String,
+    file_name: String,
     job_name: String
 }
 
@@ -124,7 +126,7 @@ export enum Completeness {
 }
 
 // Minimal (Stripped-Down) type returned from API.
-export type Constructor = {
+export type MinifiedConstructor = {
     name: string,
     location: LatLon,
     completeness_level: Completeness,

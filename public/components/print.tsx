@@ -12,15 +12,18 @@ import {
     capitalise_first_letter,
     Completeness,
     completeness_as_string,
-    Constructor,
+    Constructor, Job, JobStatus, MinifiedConstructor,
     type PrintConfig
 } from "../lib/printr";
 import {Map} from './map'
 
-export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setExpanded: Function }) => {
+export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  { expanded: boolean, setExpanded: Function, setPrintList: Function, printList: Job[] }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
+
+    const [ currentJob, setCurrentJob ] = useState<null | Job>(null);
+    const [ waiting, setWaiting ] = useState<boolean>(false);
 
     const [ config, setConfig ] = useState<PrintConfig>(DEFAULT_CONFIG);
 
@@ -71,7 +74,7 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                             onDropCapture={(e) => {e.preventDefault(); dropHandler(e.dataTransfer.files)}}
                                             // onDrop={(e) => {e.preventDefault(); dropHandler(e.dataTransfer.files)}}
                                             >
-                                            <p className="font-semibold text-center select-none">Drag and drop or <a className="text-blue-600" onClick={() => file_ref.current?.click()}>choose file</a></p>
+                                            <p className="font-semibold text-center select-none">Drag and drop or <a className="text-blue-600 cursor-pointer p-8 ml-[-2rem]" onClick={() => file_ref.current?.click()}>choose file</a></p>
                                         </div>
 
                                         {
@@ -195,7 +198,7 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                                                         >
                                                                         {delivery.method}
                                                                     </div>
-                                                                    )
+                                                            )
                                                         })
                                                     }
                                                 </div>
@@ -217,11 +220,11 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                     <div className="flex flex-col gap-2">
                                         <div className="flex flex-row items-center gap-2 cursor-pointer" onClick={() => setConfig({  ...config, DANGEROUS_PREFERS_NO_CHECKS: !config.DANGEROUS_PREFERS_NO_CHECKS })}>
                                             {
-                                            config.DANGEROUS_PREFERS_NO_CHECKS ?
-                                                <div className="flex h-4 w-4 rounded-md border-2 border-gray-700 bg-gray-700" ></div>
-                                            :
-                                                <div className="flex h-4 w-4 rounded-md border-2 border-gray-700"></div>
-                                        }
+                                                config.DANGEROUS_PREFERS_NO_CHECKS ?
+                                                    <div className="flex h-4 w-4 rounded-md border-2 border-gray-700 bg-gray-700" ></div>
+                                                :
+                                                    <div className="flex h-4 w-4 rounded-md border-2 border-gray-700"></div>
+                                            }
 
                                             <p className="font-semibold text-gray-900">Yes, I would like to skip checking</p>
                                         </div>
@@ -317,7 +320,15 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                             </div>
                                         </div>*/}
 
-                                        <p className="text-gray-500">Following placing your order, you will be notified when a constructor accepts your print</p>
+                                        <div className="flex flex-row items-center gap-4 bg-blue-100 text-blue-800 rounded-md p-2">
+                                            <div>
+                                                <svg width="20" height="20" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fillRule="evenodd" clipRule="evenodd" d="M11 0C4.92487 0 0 4.92487 0 11C0 17.0751 4.92487 22 11 22C17.0751 22 22 17.0751 22 11C22 4.92487 17.0751 0 11 0ZM11 6C10.4477 6 10 6.44772 10 7C10 7.55228 10.4477 8 11 8H11.01C11.5623 8 12.01 7.55228 12.01 7C12.01 6.44772 11.5623 6 11.01 6H11ZM12 11C12 10.4477 11.5523 10 11 10C10.4477 10 10 10.4477 10 11V15C10 15.5523 10.4477 16 11 16C11.5523 16 12 15.5523 12 15V11Z" fill="#1E40AF"/>
+                                                </svg>
+                                            </div>
+
+                                            <p className="text-blue-800">Following placing your order, you will be notified when a constructor accepts your print</p>
+                                        </div>
                                     </div>
                                 </div>
                                 )
@@ -327,21 +338,22 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                     <div className="flex justify-start flex-col gap-4 place-start flex-1" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">Order Placed!</p>
-                                            <p className="text-gray-500">Use the element below to track your order.</p>
+                                            <p className="text-gray-500">Click below to open and track your order.</p>
                                         </div>
 
-                                        <div>
-                                            <div className="bg-gray-100 px-2 py-1 rounded-md w-fit flex flex-row items-center gap-2" onClick={() => setExpanded(false)}>
-                                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M13 1L1 13M1 1L13 13" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-
-                                                <p>Close this window</p>
+                                        <div className="flex flex-1 flex-col">
+                                            <div className="flex flex-row justify-between bg-gray-100 p-2 rounded-md px-4">
+                                                <h1 className="font-bold">{currentJob?.job_name}</h1>
+                                                <p className="cursor-pointer" onClick={() => {
+                                                    setExpanded(false);
+                                                    setPrintMode(0)
+                                                    setConfig(DEFAULT_CONFIG)
+                                                }}>Track</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            )
+                                )
                     case 6:
                         return (
                                 <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
@@ -354,7 +366,7 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                                         <div className="flex flex-row items-start gap-2 justify-between flex-1 h-full" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
                                             <div className="flex flex-col gap-2 items-start flex-1">
                                                 {
-                                                    FIXED_PRINTER_OPTIONS.map((constr: Constructor) => {
+                                                    FIXED_PRINTER_OPTIONS.map((constr: MinifiedConstructor) => {
                                                         return (
                                                                 <div
                                                                     key={constr.id}
@@ -367,7 +379,7 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
 
                                                                     <p className="text-gray-600">1.25km</p>
                                                                     <a className="font-semibold cursor-pointer" onClick={() => {
-                                                                        setConfig({ ...config, constructor: constr });
+//                                                                        setConfig({ ...config, constructor: constr });
                                                                         setCanContinue(true);
                                                                     }}>Select</a>
                                                                 </div>
@@ -411,25 +423,73 @@ export const PrintStart = ({ expanded, setExpanded }:  { expanded: boolean, setE
                             // We are restarting
                             setConfig(DEFAULT_CONFIG);
                             setCanContinue(false);
-//                            file_ref.current.value = null;
 
                             setPrintMode(0);
+                        }else if(print_mode == CONFIRM_PRINT_MODE) {
+                            setWaiting(true);
+
+                            setTimeout(() => {
+                                const new_job: Job = {
+                                    id: (Math.random() * 10000).toString(),
+
+                                    created_at: new Date().toISOString(),
+                                    updated_at: new Date().toISOString(),
+
+                                    current_status: JobStatus.BIDDING,
+                                    status_history: [
+                                        {
+                                            value: JobStatus.BIDDING,
+                                            timestamp: new Date().toISOString()
+                                        }
+                                    ],
+                                    estimated_completion: null,
+
+                                    file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
+                                    file_name: config.files.map(k => k[0]?.name).join(', '),
+                                    job_name: config.files.map(k => k[0]?.name).join(', ').split('.')[0],
+
+                                    job_preferences: config
+                                };
+
+                                setCurrentJob(new_job);
+                                setPrintList([ ...printList, new_job ]);
+                                setPrintMode(5);
+                                setWaiting(false);
+                            }, 3000);
                         }else {
-                            setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
+                            setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : print_mode == 2 && can_continue ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
                         }
                     }}>
-                    <p className="select-none">{ print_mode == CONFIRM_PRINT_MODE ? "Place Order" : print_mode == CONFIRM_PRINT_MODE+1 ? "Restart" : "Continue" }</p>
+                    <p className="select-none">{ waiting ? "Processing Request" : print_mode == CONFIRM_PRINT_MODE ? "Place Order" : print_mode == CONFIRM_PRINT_MODE+1 ? "Restart" : "Continue" }</p>
 
                     {
-                        print_mode == CONFIRM_PRINT_MODE+1 ?
-                            <svg width="18" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7.54661 17.7675C9.94575 18.8319 12.8032 18.7741 15.2502 17.3613C19.3157 15.0141 20.7086 9.81556 18.3614 5.75008L18.1114 5.31706M3.63851 14.2502C1.2913 10.1847 2.68424 4.98619 6.74972 2.63898C9.19671 1.22621 12.0542 1.16841 14.4533 2.23277M1.49341 14.3338L4.22546 15.0659L4.95751 12.3338M17.0426 7.6659L17.7747 4.93385L20.5067 5.6659" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                        waiting ?
+                            <div className="rotate">
+                                <Image src="./img/spinner.svg" height="18" width="18" alt=""/>
+                            </div>
                         :
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke={`${print_mode == CONFIRM_PRINT_MODE ? "#166534" : "black"}`} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            print_mode == CONFIRM_PRINT_MODE+1 ?
+                                <svg width="18" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.54661 17.7675C9.94575 18.8319 12.8032 18.7741 15.2502 17.3613C19.3157 15.0141 20.7086 9.81556 18.3614 5.75008L18.1114 5.31706M3.63851 14.2502C1.2913 10.1847 2.68424 4.98619 6.74972 2.63898C9.19671 1.22621 12.0542 1.16841 14.4533 2.23277M1.49341 14.3338L4.22546 15.0659L4.95751 12.3338M17.0426 7.6659L17.7747 4.93385L20.5067 5.6659" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            :
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke={`${print_mode == CONFIRM_PRINT_MODE ? "#166534" : "black"}`} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
                     }
+                </div>
+
+                <div className={`bg-gray-100 px-2 py-1 rounded-md w-fit flex-row items-center gap-2 ${print_mode == 5 ? "flex" : "hidden"}`}
+                    onClick={() => {
+                        setExpanded(false);
+                        setPrintMode(0)
+                        setConfig(DEFAULT_CONFIG)
+                    }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 1L1 13M1 1L13 13" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+
+                    <p>Close this window</p>
                 </div>
             </div>
         </div>

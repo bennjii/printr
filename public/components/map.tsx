@@ -5,14 +5,14 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import {createRef, useEffect, useState} from "react";
 
 import mapboxgl, {LngLatLike, MapboxOptions} from "mapbox-gl";
-import {Constructor, from_latlon} from "../lib/printr";
+import {Constructor, from_latlon, MinifiedConstructor} from "../lib/printr";
 import * as process from "process";
 
 interface MapboxMapProps {
     initialOptions?: Omit<mapboxgl.MapboxOptions, "container">;
     onMapLoaded?(map: mapboxgl.Map): void;
     onMapRemoved?(): void;
-    constructors: Constructor[]
+    constructors: MinifiedConstructor[]
 }
 
 export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructors }: MapboxMapProps) => {

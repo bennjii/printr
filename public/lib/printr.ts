@@ -1,8 +1,33 @@
 export enum JobStatus {
     BIDDING, PREPRINT,
     PRINTING, PREDELIVERY, ENROUTE,
-    
+
     COMPLETE, CANCELED, DRAFT
+}
+
+export const job_status_to_string = (status: JobStatus) => {
+    switch(status) {
+        case JobStatus.BIDDING:
+            return "Bidding"
+        case JobStatus.CANCELED:
+            return "Canceled"
+        case JobStatus.COMPLETE:
+            return "Complete"
+        case JobStatus.DRAFT:
+            return "Draft"
+        case JobStatus.ENROUTE:
+            return "En Route"
+        case JobStatus.PREDELIVERY:
+            return "Pre-Delivery"
+        case JobStatus.PREPRINT:
+            return "Pre-Print"
+        case JobStatus.PRINTING:
+            return "Printing"
+    }
+}
+
+export const job_status_to_colour_pair = (status: JobStatus) => {
+    return status == JobStatus.PRINTING ? "bg-green-100 text-green-800" : status == JobStatus.BIDDING ? "bg-orange-100 text-orange-800" : status == JobStatus.CANCELED ? "bg-red-100 text-red-800" : status == JobStatus.ENROUTE ? "bg-yellow-100 text-yellow-800" : status == JobStatus.PREPRINT ? "bg-yellow-100 text-yellow-800" : status == JobStatus.COMPLETE ? "bg-green-100 text-green-800" : status == JobStatus.DRAFT ? "bg-orange-100 bg-orange-800" : status == JobStatus.PREDELIVERY ? "bg-gray-400 text-gray-800" : "bg-gray-400 text-gray-800"
 }
 
 export enum PrinterStatus {

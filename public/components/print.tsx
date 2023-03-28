@@ -27,11 +27,11 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
 
     const [ config, setConfig ] = useState<PrintConfig>(DEFAULT_CONFIG);
 
-    useEffect(() => {
-        if(print_mode == 3 && config.constructor == null) {
-            setCanContinue(false);
-        }
-    }, [print_mode])
+//    useEffect(() => {
+//        if(print_mode == 3 && config.constructor == null) {
+//            setCanContinue(false);
+//        }
+//    }, [print_mode])
 
     const file_ref = createRef<HTMLInputElement>();
 
@@ -409,7 +409,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
 
                 <div className="flex flex-row items-center justify-between p-8">
                     <div className={`flex flex-row items-center gap-2 cursor-pointer bg-gray-100 px-2 py-1 rounded-md ${print_mode <= 0 ? "opacity-20" : ""} ${print_mode == 5 ? "hidden" : ""}`}
-                        onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 3 && config.delivery.method != "Delivery") ? 1 : (print_mode == 4 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
+                        onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 4 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>

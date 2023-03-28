@@ -155,32 +155,6 @@ export const DEFAULT_CONFIG = {
 
 export const DEFAULT_PRINT_JOBS: Job[] = [
     {
-        id: "abnauneoan",
-
-        created_at: "2023-03-27",
-        updated_at: "2023-03-27",
-        estimated_completion: "32 minutes",
-
-        current_status: JobStatus.DRAFT,
-        status_history: [],
-
-        file_url: "sundial_print.obj",
-        file_name: "sundial_print.obj",
-        job_name: "Sundial",
-
-        job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
-            delivery: {
-                method: "Delivery",
-                prefered: false
-            },
-            files: [],
-            constructor: null,
-            DANGEROUS_PREFERS_NO_CHECKS: false
-        }
-    },
-    {
         id: "ngoi101je01",
 
         created_at: "2023-03-27",
@@ -231,6 +205,116 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
         }
+    },
+    {
+        id: "ain29h3j0wbg",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+
+        current_status: JobStatus.PREPRINT,
+        status_history: [],
+        estimated_completion: "Evaluation",
+
+        file_url: "pen_holder.obj",
+        file_name: "pen_holder.obj",
+        job_name: "Pen Holder",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    },
+    {
+        id: "abnauneoan",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+        estimated_completion: "32 minutes",
+
+        current_status: JobStatus.DRAFT,
+        status_history: [],
+
+        file_url: "sundial_print.obj",
+        file_name: "sundial_print.obj",
+        job_name: "Sundial",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [{
+                name: "sun_dial.obj"
+            }] as FileList[],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    },
+    {
+        id: "1ub2e8b19gj1",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+        estimated_completion: "32 minutes",
+
+        current_status: JobStatus.BIDDING,
+        status_history: [],
+
+        file_url: "open_twist_mushroom.obj",
+        file_name: "open_twist_mushroom.obj",
+        job_name: "Open Twist Mushroom",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [{
+                name: "sun_dial.obj"
+            }] as FileList[],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
+    },
+    {
+        id: "aoin2e10n01t",
+
+        created_at: "2023-03-27",
+        updated_at: "2023-03-27",
+        estimated_completion: "32 minutes",
+
+        current_status: JobStatus.BIDDING,
+        status_history: [],
+
+        file_url: "open_twist_mushroom.obj",
+        file_name: "open_twist_mushroom.obj",
+        job_name: "Open Twist Mushroom",
+
+        job_preferences: {
+            colour: COLOUR_OPTIONS[0],
+            filament: FILAMENT_OPTIONS[0],
+            delivery: {
+                method: "Delivery",
+                prefered: false
+            },
+            files: [{
+                name: "sun_dial.obj"
+            }] as FileList[],
+            constructor: null,
+            DANGEROUS_PREFERS_NO_CHECKS: false
+        }
     }
 ]
 
@@ -243,6 +327,6 @@ export const DEFAULT_USER: User = {
     updated_at: new Date().getUTCDate().toString(),
 
     hash: "ABCDEFG",
-    is_constructor: false,
+    is_constructor: true,
     location: "Sydney, NSW",
 }

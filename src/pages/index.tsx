@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
 import {Job, JobStatus} from "../../public/lib/printr";
+import {Header} from "../../public/components/header";
+import {JobElement} from "../../public/components/job";
 //<div className="bg-gray-900 px-4 py-2 rounded-lg text-white">Start Printing</div>
 
 const Home: NextPage = () => {
@@ -14,6 +16,8 @@ const Home: NextPage = () => {
 
     const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+
+    const [ activeMenu, setActiveMenu ] = useState<number>(0);
 
     useEffect(() => {
         let diff = rawPrintList.filter(element => !printList.includes(element));
@@ -27,22 +31,7 @@ const Home: NextPage = () => {
 
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
-                <title>Printr</title>
-                <link rel="icon" href="/favicon.ico" />
-
-                <div className="flex flex-row items-center justify-between w-full min-w-screen px-8 py-4">
-                    <div className="flex flex-row items-center gap-2">
-                        <Image src="favicon.svg" alt="" height={28} width={28}></Image>
-                        <p className="font-bold text-xl">printr</p>
-                    </div>
-
-                    <p></p>
-
-                    <div className="flex flex-row items-center gap-4">
-                        <p>{activeUser.name}</p>
-                        <Image src="/img/user_icons/blurple.svg" alt="" height={35} width={35}></Image>
-                    </div>
-                </div>
+                <Header activeUser={activeUser} currentPage="INDX" />
 
                 <div className="flex flex-row flex-1 w-full p-8 gap-8">
                     <div className="flex flex-1 flex-col gap-2 min-w-[300px] max-w-[300px]">
@@ -50,23 +39,14 @@ const Home: NextPage = () => {
 
                         {/* All of the prints in queue */}
                         {
-                            printList.map(k => {
-                                return (
-                                    <div
-                                        onClick={() => {
-                                            setExpanded(false)
-                                            setActivePrint(k)
-                                        }}
-                                        key={k.id}
-                                        className={`flex flex-row items-center bg-gray-100 gap-4 px-4 py-2 rounded-md cursor-pointer ${k.current_status == JobStatus.COMPLETE || k.current_status == JobStatus.CANCELED || k.current_status == JobStatus.DRAFT ? "opacity-40" : ""}`}>
-                                        <div className={`${k.current_status == JobStatus.PRINTING ? "bg-green-400" : k.current_status == JobStatus.BIDDING ? "bg-orange-400" : k.current_status == JobStatus.CANCELED ? "bg-red-400" : k.current_status == JobStatus.ENROUTE ? "" : k.current_status == JobStatus.PREPRINT ? "bg-yellow-400" : k.current_status == JobStatus.COMPLETE ? "bg-green-400" : k.current_status == JobStatus.DRAFT ? "bg-orange-400" : k.current_status == JobStatus.PREDELIVERY ? "bg-gray-400" : "bg-gray-400"} h-[20px] w-[20px] rounded-full`}></div>
-                                        <div className="">
-                                            <p className="font-bold">{k.job_name}</p>
-                                            <p className="text-gray-600">{k.current_status == JobStatus.PRINTING ? `${k.estimated_completion} Remaining` : k.current_status == JobStatus.BIDDING ? "Bidding" : k.current_status == JobStatus.CANCELED ? "Canceled" : k.current_status == JobStatus.DRAFT ? "Draft" : k.current_status == JobStatus.ENROUTE ? "En Route" : k.current_status == JobStatus.PREPRINT ? "Preparing to print" : "" }</p>
-                                        </div>
-                                    </div>
-                                )
-                            })
+                            printList.filter(k => k.current_status < 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
+                        }
+
+                        <br />
+
+                        <p className="text-gray-600">Old Prints</p>
+                        {
+                            printList.filter(k => k.current_status >= 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
                         }
                     </div>
 

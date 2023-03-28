@@ -161,11 +161,18 @@ export type MinifiedConstructor = {
 
 export type Pending = null;
 
+export type File = {
+    name: string,
+    size: number,
+    url: string
+}
+
 export type PrintConfig = {
     colour: Colour,
     filament: Filament,
     delivery: DeliveryMethod,
-    files: FileList[],
+    message: string,
+    files: File[],
     constructor: Pending | Constructor,
     DANGEROUS_PREFERS_NO_CHECKS: boolean
 }

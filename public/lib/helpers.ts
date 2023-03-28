@@ -150,6 +150,7 @@ export const DEFAULT_CONFIG = {
     filament: FILAMENT_OPTIONS[0]!,
     delivery: DELIVERY_OPTIONS[0]!,
     files: [],
+    message: "",
     constructor: null,
     DANGEROUS_PREFERS_NO_CHECKS: false
 }
@@ -176,6 +177,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
@@ -202,6 +204,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
@@ -228,6 +231,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
@@ -254,6 +258,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
@@ -280,6 +285,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
@@ -306,6 +312,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
                 method: "Delivery",
                 prefered: false
             },
+            message: "",
             files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false

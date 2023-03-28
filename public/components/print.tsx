@@ -17,7 +17,7 @@ import {
 } from "../lib/printr";
 import {Map} from './map'
 
-export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList }:  { activeMenu: boolean, setActiveMenu: Function, setPrintList: Function, printList: Job[] }) => {
+export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList }:  { activeMenu: number, setActiveMenu: Function, setPrintList: Function, printList: Job[] }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
@@ -25,15 +25,10 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
     const [ currentJob, setCurrentJob ] = useState<null | Job>(null);
     const [ waiting, setWaiting ] = useState<boolean>(false);
 
-    const [ config, setConfig ] = useState<PrintConfig>(DEFAULT_CONFIG);
-
-//    useEffect(() => {
-//        if(print_mode == 3 && config.constructor == null) {
-//            setCanContinue(false);
-//        }
-//    }, [print_mode])
+    const [ config, setConfig ] = useState<PrintConfig>({ ...JSON.parse(JSON.stringify((DEFAULT_CONFIG))) });
 
     const file_ref = createRef<HTMLInputElement>();
+    const message_ref = createRef<HTMLInputElement>();
 
     const onFileChangeCapture = ( e: ChangeEvent<HTMLInputElement> ) => {
         e.preventDefault();
@@ -44,7 +39,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
         setIsDragged(false);
 
         const f_l = config.files;
-        f_l.push(files)
+        f_l.push({ name: files.item(0).name, size: files.item(0).size, url: "" });
 
         setConfig({ ...config, files: f_l })
         setCanContinue(true);
@@ -54,8 +49,6 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
             <div className={`flex flex-col flex-1 `}>
                 {(() => {
                     switch(print_mode) {
-                        // style={{ background: "radial-gradient(circle, rgba(41,98,255,0.7861738445378151) 42%, rgba(252,252,252,1) 68%)" }}
-                    // <div className="absolute w-full h-full bg-blue-50 z-0 bg-opacity-20 blur-3xl dark:bg-opacity-20 dark:bg-blue-200"></div>
                     case 0:
                         return (
                                 <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
@@ -78,18 +71,16 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                         </div>
 
                                         {
-                                        config.files.map((file, i) => {
-                                            console.log("F", file);
-
-                                            return (
-                                                    <div key={`INDX-${i}`} className="flex flex-row items-center gap-2">
-                                                        <div className="bg-blue-200 text-blue-800 px-2 rounded-md">{file[0]?.name.split(".")[1]}</div>
-                                                        <p>{file[0]?.size ? getSize(file[0]?.size.toString(), 2) : "0B"}</p>
-                                                        <p className="text-gray-600">{file[0]?.name.split(".")[0]}</p>
+                                            config.files.map((file, i) => {
+                                                return (
+                                                    <div key={`INDX-${file.name}`} className="flex flex-row items-center gap-2">
+                                                        <div className="bg-blue-200 text-blue-800 px-2 rounded-md">{file?.name.split(".")[1]}</div>
+                                                        <p>{file?.size ? getSize(file?.size.toString(), 2) : "0B"}</p>
+                                                        <p className="text-gray-600">{file?.name.split(".")[0]}</p>
                                                     </div>
-                                                    )
-                                        })
-                                    }
+                                                )
+                                            })
+                                        }
                                     </div>
                                 </div>
                                 )
@@ -255,7 +246,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             File(s):
                                                         </div>
-                                                        {config.files.map(k => k[0]?.name).join(', ')}
+                                                        {config.files.map(k => k.name).join(', ')}
                                                     </div>
 
                                                     <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
@@ -322,6 +313,17 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                             </div>
                                         </div>*/}
 
+                                        <div className="flex flex-col gap-1 rounded-md p-2">
+                                            <div className="flex flex-row items-center gap-2">
+                                                <p className="text-gray-400 text-sm">OPTIONAL: </p>
+                                                <p className="text-gray-600">You may leave a message for your printer</p>
+                                            </div>
+
+                                            <input ref={message_ref} placeholder="Please be aware of the sharp corner" className="px-4 py-2 rounded-md" onChange={(e) => {
+                                                setConfig({ ...config, message: e.target.value });
+                                            }}></input>
+                                        </div>
+
                                         <div className="flex flex-row items-center gap-4 bg-blue-100 text-blue-800 rounded-md p-2">
                                             <div>
                                                 <svg width="20" height="20" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -348,7 +350,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                                 onClick={() => {
                                                     setActiveMenu(1);
                                                     setPrintMode(0)
-                                                    setConfig(DEFAULT_CONFIG)
+                                                    setConfig({ ...DEFAULT_CONFIG })
                                                 }}>
                                                 <h1 className="font-bold">{currentJob?.job_name}</h1>
                                                 <p className="cursor-pointer" >Track</p>
@@ -424,8 +426,10 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                         onClick={() => {
                         if(print_mode == CONFIRM_PRINT_MODE+1) {
                             // We are restarting
-                            setConfig(DEFAULT_CONFIG);
                             setCanContinue(false);
+                            setConfig({ ...DEFAULT_CONFIG });
+
+                            console.log(DEFAULT_CONFIG);
 
                             setPrintMode(0);
                         }else if(print_mode == CONFIRM_PRINT_MODE) {
@@ -448,8 +452,8 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                     estimated_completion: null,
 
                                     file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
-                                    file_name: config.files.map(k => k[0]?.name).join(', '),
-                                    job_name: config.files.map(k => k[0]?.name).join(', ').split('.')[0] ?? "",
+                                    file_name: config.files.map(k => k.name).join(', '),
+                                    job_name: config.files.map(k => k.name).join(', ').split('.')[0] ?? "",
 
                                     job_preferences: config
                                 };
@@ -486,7 +490,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                     onClick={() => {
                         setActiveMenu(1);
                         setPrintMode(0)
-                        setConfig(DEFAULT_CONFIG)
+                        setConfig({ ...DEFAULT_CONFIG })
                     }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M13 1L1 13M1 1L13 13" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

@@ -27,7 +27,7 @@ export const job_status_to_string = (status: JobStatus) => {
 }
 
 export const job_status_to_colour_pair = (status: JobStatus) => {
-    return status == JobStatus.PRINTING ? "bg-green-100 text-green-800" : status == JobStatus.BIDDING ? "bg-orange-100 text-orange-800" : status == JobStatus.CANCELED ? "bg-red-100 text-red-800" : status == JobStatus.ENROUTE ? "bg-yellow-100 text-yellow-800" : status == JobStatus.PREPRINT ? "bg-yellow-100 text-yellow-800" : status == JobStatus.COMPLETE ? "bg-green-100 text-green-800" : status == JobStatus.DRAFT ? "bg-orange-100 bg-orange-800" : status == JobStatus.PREDELIVERY ? "bg-gray-400 text-gray-800" : "bg-gray-400 text-gray-800"
+    return status == JobStatus.PRINTING ? "bg-green-100 text-green-800" : status == JobStatus.BIDDING ? "bg-orange-100 text-orange-800" : status == JobStatus.CANCELED ? "bg-red-100 text-red-800" : status == JobStatus.ENROUTE ? "bg-yellow-100 text-yellow-800" : status == JobStatus.PREPRINT ? "bg-yellow-100 text-yellow-800" : status == JobStatus.COMPLETE ? "bg-green-100 text-green-800" : status == JobStatus.DRAFT ? "bg-orange-100 text-orange-800" : status == JobStatus.PREDELIVERY ? "bg-gray-400 text-gray-800" : "bg-gray-400 text-gray-800"
 }
 
 export enum PrinterStatus {
@@ -109,6 +109,7 @@ export type Job = {
 
 export type Bid = {
     id: string,
+    bidder: string
 
     created_at: string,
     updated_at: string,

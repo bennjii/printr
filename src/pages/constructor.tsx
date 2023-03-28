@@ -1,7 +1,7 @@
 import {type NextPage} from "next";
 import {useEffect, useState} from "react";
 import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
-import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from "../../public/lib/printr";
+import {type Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
 

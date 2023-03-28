@@ -39,7 +39,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
         setIsDragged(false);
 
         const f_l = config.files;
-        f_l.push({ name: files.item(0).name, size: files.item(0).size, url: "" });
+        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "" });
 
         setConfig({ ...config, files: f_l })
         setCanContinue(true);
@@ -100,7 +100,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                                             File(s):
                                                         </div>
                                                         {
-                                                            config.files[0].name // .map(k => k[0]?.name)  .join(', ')
+                                                            config.files[0]?.name ?? "" // .map(k => k[0]?.name)  .join(', ')
                                                         }
                                                     </div>
 

@@ -446,7 +446,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
 
                                     file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
                                     file_name: config.files.map(k => k[0]?.name).join(', '),
-                                    job_name: config.files.map(k => k[0]?.name).join(', ').split('.')[0],
+                                    job_name: config.files.map(k => k[0]?.name).join(', ').split('.')[0] ?? "",
 
                                     job_preferences: config
                                 };

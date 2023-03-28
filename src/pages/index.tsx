@@ -1,12 +1,10 @@
 import {type NextPage} from "next";
-import Image from "next/image";
 import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
 import {Job, JobStatus} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
-//<div className="bg-gray-900 px-4 py-2 rounded-lg text-white">Start Printing</div>
 
 const Home: NextPage = () => {
     const [ expanded, setExpanded ] = useState(true);
@@ -17,10 +15,8 @@ const Home: NextPage = () => {
     const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
 
-    const [ activeMenu, setActiveMenu ] = useState<number>(0);
-
     useEffect(() => {
-        let diff = rawPrintList.filter(element => !printList.includes(element));
+        const diff = rawPrintList.filter(element => !printList.includes(element));
 
         if(diff.length > 0) {
             setActivePrint(diff[0])
@@ -39,14 +35,14 @@ const Home: NextPage = () => {
 
                         {/* All of the prints in queue */}
                         {
-                            printList.filter(k => k.current_status < 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
+                            printList.filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
                         }
 
                         <br />
 
                         <p className="text-gray-600">Old Prints</p>
                         {
-                            printList.filter(k => k.current_status >= 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
+                            printList.filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
                         }
                     </div>
 
@@ -91,15 +87,15 @@ const Home: NextPage = () => {
 
                             }
                             </div>
-                            <p className="select-none font-semibold">{activePrint.job_name}</p>
+                            <p className="select-none font-semibold">{activePrint?.job_name}</p>
                         </div>
 
                         <div className={`${!expanded ? "flex" : "none hidden"} flex-col flex-1`}>
                             <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
                                 <div className="flex justify-start flex-col gap-4 place-start" >
                                     <div className="flex flex-col">
-                                        <p className="font-bold text-xl">{activePrint.job_name}</p>
-                                        <p className="text-gray-500">{activePrint.file_name}</p>
+                                        <p className="font-bold text-xl">{activePrint?.job_name}</p>
+                                        <p className="text-gray-500">{activePrint?.file_name}</p>
                                     </div>
                                 </div>
 
@@ -109,14 +105,14 @@ const Home: NextPage = () => {
                                             <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                 File(s):
                                             </div>
-                                            {activePrint.job_preferences.files.map(k => k[0]?.name).join(', ')}
+                                            {activePrint?.job_preferences?.files?.map(k => k[0]?.name).join(', ')}
                                         </div>
 
                                         <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                             <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                 Colour:
                                             </div>
-                                            {activePrint.job_preferences.colour.name}
+                                            {activePrint?.job_preferences?.colour?.name}
                                         </div>
                                     </div>
 
@@ -125,20 +121,20 @@ const Home: NextPage = () => {
                                             <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                 Filament:
                                             </div>
-                                            {activePrint.job_preferences.filament.name}
+                                            {activePrint?.job_preferences?.filament?.name}
                                         </div>
 
                                         <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                             <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                 Delivery Method:
                                             </div>
-                                            {activePrint.job_preferences.delivery.method}
+                                            {activePrint?.job_preferences?.delivery?.method}
                                         </div>
                                     </div>
                                 </div>
 
                                 {(() => {
-                                    switch(activePrint.current_status) {
+                                    switch(activePrint?.current_status) {
                                         case JobStatus.DRAFT:
                                             return (
                                                     <div>
@@ -150,7 +146,7 @@ const Home: NextPage = () => {
                                     }
                                 })()}
 
-                                 <p>{activePrint.status_history.map(k => {})}</p>
+                                 <p>{activePrint?.status_history?.map(k => { return (<></>) })}</p>
                             </div>
                         </div>
                     </div>

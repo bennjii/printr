@@ -169,8 +169,8 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         file_name: "clock_hands.obj",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
@@ -195,8 +195,8 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         job_name: "Nose Cone",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
@@ -221,8 +221,8 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         job_name: "Pen Holder",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
@@ -247,15 +247,13 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         job_name: "Sundial",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
             },
-            files: [{
-                name: "sun_dial.obj"
-            }] as FileList[],
+            files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
         }
@@ -275,15 +273,13 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         job_name: "Open Twist Mushroom",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
             },
-            files: [{
-                name: "sun_dial.obj"
-            }] as FileList[],
+            files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
         }
@@ -303,15 +299,13 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         job_name: "Open Twist Mushroom",
 
         job_preferences: {
-            colour: COLOUR_OPTIONS[0],
-            filament: FILAMENT_OPTIONS[0],
+            colour: COLOUR_OPTIONS[0]!,
+            filament: FILAMENT_OPTIONS[0]!,
             delivery: {
                 method: "Delivery",
                 prefered: false
             },
-            files: [{
-                name: "sun_dial.obj"
-            }] as FileList[],
+            files: [],
             constructor: null,
             DANGEROUS_PREFERS_NO_CHECKS: false
         }

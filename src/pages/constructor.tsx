@@ -21,7 +21,7 @@ const Home: NextPage = () => {
     }, [activeMenu]);
 
     useEffect(() => {
-        let diff = rawPrintList.filter(element => !printList.includes(element));
+        const diff = rawPrintList.filter(element => !printList.includes(element));
 
         if(diff.length > 0) {
             setActivePrint(diff[0])
@@ -40,14 +40,14 @@ const Home: NextPage = () => {
 
                         {/* All of the prints in queue */}
                         {
-                            printList.filter(k => k.current_status != 7 && k.current_status != 0).filter(k => k.current_status < 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => k.current_status != 7 && k.current_status != 0).filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
 
                         <br />
 
                         <p className="text-gray-600">Inactive Jobs</p>
                         {
-                            printList.filter(k => k.current_status != 7).filter(k => k.current_status >= 5).map(k => <JobElement k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => k.current_status != 7).filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
                     </div>
 
@@ -60,7 +60,7 @@ const Home: NextPage = () => {
                                 }
                             </div>
 
-                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>{activePrint.job_name}</div>
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>{activePrint?.job_name}</div>
                         </div>
 
                         <div className={`flex flex-col flex-1 bg-gray-100 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
@@ -105,11 +105,11 @@ const Home: NextPage = () => {
                                             <div className="flex justify-start flex-col gap-4 place-start" >
                                                 <div className="flex flex-col">
                                                     <div className="flex flex-row items-center gap-2">
-                                                        <p className="font-bold text-xl">{activePrint.job_name}</p>
-                                                        <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint.current_status)}`}>{job_status_to_string(activePrint.current_status)}</p>
+                                                        <p className="font-bold text-xl">{activePrint?.job_name}</p>
+                                                        <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint?.current_status ?? JobStatus.DRAFT)}`}>{job_status_to_string(activePrint?.current_status ?? JobStatus.DRAFT)}</p>
                                                     </div>
 
-                                                    <p className="text-gray-500">{activePrint.file_name}</p>
+                                                    <p className="text-gray-500">{activePrint?.file_name}</p>
                                                 </div>
                                             </div>
 
@@ -119,14 +119,14 @@ const Home: NextPage = () => {
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             File:
                                                         </div>
-                                                        {activePrint.file_name}
+                                                        {activePrint?.file_name}
                                                     </div>
 
                                                     <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Colour:
                                                         </div>
-                                                        {activePrint.job_preferences.colour.name}
+                                                        {activePrint?.job_preferences?.colour?.name}
                                                     </div>
                                                 </div>
 
@@ -135,32 +135,19 @@ const Home: NextPage = () => {
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Filament:
                                                         </div>
-                                                        {activePrint.job_preferences.filament.name}
+                                                        {activePrint?.job_preferences?.filament?.name}
                                                     </div>
 
                                                     <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Delivery Method:
                                                         </div>
-                                                        {activePrint.job_preferences.delivery.method}
+                                                        {activePrint?.job_preferences?.delivery?.method}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {(() => {
-                                                switch(activePrint.current_status) {
-                                                    case JobStatus.DRAFT:
-                                                        return (
-                                                                <div>
-
-                                                                </div>
-                                                                )
-                                                        default:
-                                                            return (<></>)
-                                                }
-                                            })()}
-
-                                            <p>{activePrint.status_history.map(k => {})}</p>
+                                            <p>{activePrint?.status_history?.map(k => { return ( <></> ) })}</p>
                                     </div>
                             }
                     </div>

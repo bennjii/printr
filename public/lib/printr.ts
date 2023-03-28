@@ -36,7 +36,7 @@ export enum PrinterStatus {
 
 export type History<T> = {
     value: T,
-    timestamp: String
+    timestamp: string
 }
 
 export type Colour = {
@@ -57,61 +57,61 @@ export type LatLon = {
 }
 
 export type User = {
-    id: String,
-    email: String,
-    name: String,
+    id: string,
+    email: string,
+    name: string,
 
-    created_at: String,
-    updated_at: String,
+    created_at: string,
+    updated_at: string,
 
-    hash: String,
+    hash: string,
     is_constructor: boolean,
-    location: String,
+    location: string,
 }
 
 export type Constructor = {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
 
-    created_at: String,
-    updated_at: String,
+    created_at: string,
+    updated_at: string,
 
-    owner_id: String,
-    location: String
+    owner_id: string,
+    location: string
 }
 
 export type Printer = {
-    id: String,
-    model: String,
+    id: string,
+    model: string,
 
-    created_at: String,
-    updated_at: String,
+    created_at: string,
+    updated_at: string,
 
     current_status: PrinterStatus
 }
 
 export type Job = {
-    id: String,
+    id: string,
 
-    created_at: String,
-    updated_at: String,
+    created_at: string,
+    updated_at: string,
 
     current_status: JobStatus,
     status_history: History<JobStatus>[],
-    estimated_completion: String | null,
+    estimated_completion: string | null,
 
     job_preferences: PrintConfig
 
-    file_url: String,
-    file_name: String,
-    job_name: String
+    file_url: string,
+    file_name: string,
+    job_name: string
 }
 
 export type Bid = {
-    id: String,
+    id: string,
 
-    created_at: String,
-    updated_at: String,
+    created_at: string,
+    updated_at: string,
 
     price: number
 }

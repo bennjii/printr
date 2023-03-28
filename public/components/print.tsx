@@ -17,7 +17,7 @@ import {
 } from "../lib/printr";
 import {Map} from './map'
 
-export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  { expanded: boolean, setExpanded: Function, setPrintList: Function, printList: Job[] }) => {
+export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList }:  { activeMenu: boolean, setActiveMenu: Function, setPrintList: Function, printList: Job[] }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
@@ -51,7 +51,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
     }
 
     return (
-            <div className={`${expanded ? "flex" : "none hidden"} flex-col flex-1 `}>
+            <div className={`flex flex-col flex-1 `}>
                 {(() => {
                     switch(print_mode) {
                         // style={{ background: "radial-gradient(circle, rgba(41,98,255,0.7861738445378151) 42%, rgba(252,252,252,1) 68%)" }}
@@ -102,13 +102,15 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                                             <p className="text-gray-500">Choose your desired colour, filament and method of delivery</p>
                                             <br />
 
-                                            <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                            <div className="none flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "none", gridTemplateColumns: "1fr 1fr" }}>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             File(s):
                                                         </div>
-                                                        {config.files.map(k => k[0]?.name).join(', ')}
+                                                        {
+                                                            config.files[0].name // .map(k => k[0]?.name)  .join(', ')
+                                                        }
                                                     </div>
 
                                                     <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
@@ -147,14 +149,14 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                                                         COLOUR_OPTIONS.map(colour => {
                                                             return (
                                                                     <div
-                                                                        style={{ backgroundColor: colour.primary_hex, color: colour.secondary_hex }}
-                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer"
+                                                                        style={{ backgroundColor: colour.primary_hex, color: colour.secondary_hex, border: `2px ${colour.code == config.colour.code ? colour.secondary_hex : "transparent"} solid` }}
+                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer select-none"
                                                                         key={colour.code}
                                                                         onClick={() => setConfig({ ...config, colour: colour })}
                                                                         >
                                                                         {colour.name}
                                                                     </div>
-                                                                    )
+                                                                )
                                                         })
                                                     }
                                                 </div>
@@ -170,7 +172,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                                                             return (
                                                                     <div
                                                                         style={{ backgroundColor: config.filament.code == filament.code ? "#E5E5E5" : "#F5F5F5", color: config.filament.code == filament.code ? "#4D4D4D" : "#777777" }}
-                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer"
+                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer select-none"
                                                                         key={filament.code}
                                                                         onClick={() => setConfig({ ...config, filament: filament })}
                                                                         >
@@ -192,7 +194,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                                                             return (
                                                                     <div
                                                                         style={{ backgroundColor: config.delivery.method == delivery.method ? "#E5E5E5" : "#F5F5F5", color: config.delivery.method == delivery.method  ? "#4D4D4D" : "#777777" }}
-                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer"
+                                                                        className="flex flex-row items-center px-3 py-1 rounded-md cursor-pointer select-none"
                                                                         key={delivery.method}
                                                                         onClick={() => setConfig({ ...config, delivery: delivery })}
                                                                         >
@@ -342,13 +344,14 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                                         </div>
 
                                         <div className="flex flex-1 flex-col">
-                                            <div className="flex flex-row justify-between bg-gray-100 p-2 rounded-md px-4">
-                                                <h1 className="font-bold">{currentJob?.job_name}</h1>
-                                                <p className="cursor-pointer" onClick={() => {
-                                                    setExpanded(false);
+                                            <div className="flex flex-row justify-between bg-blue-100 text-blue-800 p-2 rounded-md px-4 cursor-pointer"
+                                                onClick={() => {
+                                                    setActiveMenu(1);
                                                     setPrintMode(0)
                                                     setConfig(DEFAULT_CONFIG)
-                                                }}>Track</p>
+                                                }}>
+                                                <h1 className="font-bold">{currentJob?.job_name}</h1>
+                                                <p className="cursor-pointer" >Track</p>
                                             </div>
                                         </div>
                                     </div>
@@ -408,7 +411,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                 })()}
 
                 <div className="flex flex-row items-center justify-between p-8">
-                    <div className={`flex flex-row items-center gap-2 cursor-pointer bg-gray-100 px-2 py-1 rounded-md ${print_mode <= 0 ? "opacity-20" : ""} ${print_mode == 5 ? "hidden" : ""}`}
+                    <div className={`flex flex-row items-center gap-2 cursor-pointer bg-gray-200 px-2 py-1 rounded-md ${print_mode <= 0 ? "opacity-20" : ""} ${print_mode == 5 ? "hidden" : ""}`}
                         onClick={() => setPrintMode(print_mode < 1 ? 0 : (print_mode == 4 && config.delivery.method != "Delivery") ? 1 : print_mode-1 as typeof print_mode)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -417,7 +420,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
                         <p className="select-none">Back</p>
                     </div>
 
-                    <div className={`flex flex-row items-center gap-2 cursor-pointer  px-2 py-1 rounded-md ${!can_continue ? "opacity-20" : ""} ${print_mode == CONFIRM_PRINT_MODE ? "bg-green-100 text-green-800" : "bg-gray-100"}`}
+                    <div className={`flex flex-row items-center gap-2 cursor-pointer px-2 py-1 rounded-md ${!can_continue ? "opacity-20" : ""} ${print_mode == CONFIRM_PRINT_MODE ? "bg-green-100 text-green-800" : "bg-gray-200"}`}
                         onClick={() => {
                         if(print_mode == CONFIRM_PRINT_MODE+1) {
                             // We are restarting
@@ -481,7 +484,7 @@ export const PrintStart = ({ expanded, setExpanded, setPrintList, printList }:  
 
                 <div className={`bg-gray-100 px-2 py-1 rounded-md w-fit flex-row items-center gap-2 ${print_mode == 5 ? "flex" : "hidden"}`}
                     onClick={() => {
-                        setExpanded(false);
+                        setActiveMenu(1);
                         setPrintMode(0)
                         setConfig(DEFAULT_CONFIG)
                     }}>

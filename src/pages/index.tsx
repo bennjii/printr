@@ -8,8 +8,6 @@ import {JobElement} from "../../public/components/job";
 import Image from "next/image";
 
 const Home: NextPage = () => {
-    const [ expanded, setExpanded ] = useState(true);
-
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
     const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
 
@@ -38,191 +36,168 @@ const Home: NextPage = () => {
 
                         {/* All of the prints in queue */}
                         {
-                            printList.filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
+                            printList.filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
 
                         <br />
 
                         <p className="text-gray-600">Old Prints</p>
                         {
-                            printList.filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setExpanded={setExpanded} />)
+                            printList.filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
                     </div>
 
-                    <div className={`flex flex-col gap-2 flex-1 py-[32px] pb-0`}>
-                        
-
-                        <div className={`flex ${ expanded ? "flex-1 " : ""} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
-                            <div className="cursor-pointer flex w-full bg-gray-100 px-4 py-2 rounded-md items-center gap-4" onClick={() => setExpanded(!expanded)}>
-                                <div className="w-[14px] flex items-center justify-center">
-                                    {
-                                    expanded ?
-                                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    :
-                                        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-
-                                }
-                                </div>
-
-                                <p className="select-none font-semibold">Print Now</p>
+                    <div className={`flex flex-col flex-1 py-[32px] pb-0`}>
+                        <div className="flex flex-row items-center gap-2">
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 0 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu(0)}>
+                                Print Now
                             </div>
 
-                            <PrintStart
-                                expanded={expanded} setExpanded={setExpanded}
-                                printList={rawPrintList} setPrintList={setRawPrintList}
-                                />
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>{activePrint?.job_name}</div>
                         </div>
 
-                        <div className={`flex ${ !expanded ? "flex-1" : ""} bg-blue-100 overflow-none flex-col bg-gray-50 bg-opacity-50 rounded-md w-full`}>
-                            <div className="cursor-pointer flex w-full bg-gray-100 px-4 py-2 rounded-md items-center gap-4" onClick={() => setExpanded(!expanded)}>
-                            <div className="w-[14px] flex items-center justify-center">
-                                {
-                                 !expanded ?
-                                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 1L7 7L13 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
+                        <div className={`flex flex-col flex-1 bg-gray-50 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
+                            {
+                                activeMenu == 0 ?
+                                    <div className={`flex flex-1 bg-blue-100 overflow-none flex-col bg-gray-100 bg-opacity-50 rounded-md w-full`}>
+                                        <PrintStart
+                                            activeMenu={activeMenu} setActiveMenu={setActiveMenu}
+                                            printList={rawPrintList} setPrintList={setRawPrintList}
+                                        />
+                                    </div>
                                 :
-                                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 13L7 7L1 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
 
-                            }
-                            </div>
-                            <p className="select-none font-semibold">{activePrint?.job_name}</p>
-                        </div>
-
-                        <div className={`${!expanded ? "flex" : "none hidden"} flex-col flex-1`}>
-                            <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
-                                <div className="flex justify-start flex-row items-center justify-between pr-4 gap-4 place-start" >
-                                    <div className="flex flex-col">
-                                        <div className="flex flex-row items-center gap-2">
-                                            <p className="font-bold text-xl">{activePrint?.job_name}</p>
-                                            <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint?.current_status ?? JobStatus.DRAFT)}`}>{job_status_to_string(activePrint?.current_status ?? JobStatus.DRAFT)}</p>
-                                        </div>
-                                        <p className="text-gray-500">{activePrint?.file_name}</p>
-                                    </div>
-
-                                    <div>
-                                        {
-                                            activePrint?.current_status == JobStatus.DRAFT ?
-                                                <div className="px-4 py-1 bg-gray-100 rounded-md cursor-pointer">Edit</div>
-                                                :
-                                                <></>
-                                        }
-                                    </div>
-                                </div>
-
-                                <div id="" className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
-                                            <div className="bg-gray-200 px-2 rounded-md font-semibold">
-                                                File(s):
+                        <div className={`flex overflow-none flex-col bg-gray-100 rounded-md w-full`}>
+                            <div className={`flex flex-col flex-1`}>
+                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
+                                    <div className="flex justify-start flex-row items-center justify-between pr-4 gap-4 place-start" >
+                                        <div className="flex flex-col">
+                                            <div className="flex flex-row items-center gap-2">
+                                                <p className="font-bold text-xl">{activePrint?.job_name}</p>
+                                                <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint?.current_status ?? JobStatus.DRAFT)}`}>{job_status_to_string(activePrint?.current_status ?? JobStatus.DRAFT)}</p>
                                             </div>
-                                            {activePrint?.file_name}
+                                            <p className="text-gray-500">{activePrint?.file_name}</p>
                                         </div>
 
-                                        <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
-                                            <div className="bg-gray-200 px-2 rounded-md font-semibold">
-                                                Colour:
-                                            </div>
-                                            {activePrint?.job_preferences?.colour?.name}
+                                        <div>
+                                            {
+                                                activePrint?.current_status == JobStatus.DRAFT ?
+                                                    <div className="px-4 py-1 bg-gray-100 rounded-md cursor-pointer">Edit</div>
+                                                    :
+                                                    <></>
+                                            }
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
-                                            <div className="bg-gray-200 px-2 rounded-md font-semibold">
-                                                Filament:
-                                            </div>
-                                            {activePrint?.job_preferences?.filament?.name}
-                                        </div>
-
-                                        <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
-                                            <div className="bg-gray-200 px-2 rounded-md font-semibold">
-                                                Delivery Method:
-                                            </div>
-                                            {activePrint?.job_preferences?.delivery?.method}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {(() => {
-                                    switch(activePrint?.current_status) {
-                                        case JobStatus.DRAFT:
-                                            return (
-                                                <div className="flex flex-row items-start justify-center flex-1">
-                                                    <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                        <p className="text-gray-400">This is currently a draft</p>
-                                                        <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Request Print</p>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
-                                                        <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
-                                                    </div>
+                                    <div id="" className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                    File(s):
                                                 </div>
-                                            )
-                                        case JobStatus.BIDDING:
-                                            return (
-                                                <div className="flex flex-row items-start justify-center flex-1 gap-4">
-                                                    <div className="flex flex-col gap-2 justify-start items-start flex-1">
-                                                        <p className="text-gray-600">Bids</p>
+                                                {activePrint?.file_name}
+                                            </div>
 
-                                                        {
-                                                            DEFAULT_BIDS.map((bid, i, a) => {
-                                                                return (
-                                                                    <>
-                                                                        <div key={bid.id} className="flex flex-row items-center gap-2 flex-1 justify-between w-full" style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px" }}>
-                                                                            <p className="font-semibold">{bid.bidder}</p>
-                                                                            <p className="text-gray-600">${bid.price.toFixed(2)}</p>
-                                                                            <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
-                                                                                Accept Bid
+                                            <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                    Colour:
+                                                </div>
+                                                {activePrint?.job_preferences?.colour?.name}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                    Filament:
+                                                </div>
+                                                {activePrint?.job_preferences?.filament?.name}
+                                            </div>
+
+                                            <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
+                                                <div className="bg-gray-200 px-2 rounded-md font-semibold">
+                                                    Delivery Method:
+                                                </div>
+                                                {activePrint?.job_preferences?.delivery?.method}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {(() => {
+                                        switch(activePrint?.current_status) {
+                                            case JobStatus.DRAFT:
+                                                return (
+                                                        <div className="flex flex-row items-start justify-center flex-1">
+                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                <p className="text-gray-400">This is currently a draft</p>
+                                                                <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Request Print</p>
+                                                            </div>
+
+                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                            </div>
+                                                        </div>
+                                                        )
+                                            case JobStatus.BIDDING:
+                                                return (
+                                                    <div className="flex flex-row items-start justify-center flex-1 gap-4">
+                                                        <div className="flex flex-col gap-2 justify-start items-start flex-1">
+                                                            <p className="text-gray-600">Bids</p>
+
+                                                            {
+                                                                DEFAULT_BIDS.map((bid, i, a) => {
+                                                                    return (
+                                                                        <>
+                                                                            <div key={bid.id} className="flex flex-row items-center gap-2 flex-1 justify-between w-full" style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px" }}>
+                                                                                <p className="font-semibold">{bid.bidder}</p>
+                                                                                <p className="text-gray-600">${bid.price.toFixed(2)}</p>
+                                                                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
+                                                                                    Accept Bid
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
 
-                                                                        {
-                                                                            i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
-                                                                        }
-                                                                    </>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-
-                                                    <br />
-
-                                                    <div className="flex flex-col gap-2 justify-center flex-1 rounded-md overflow-hidden h-full">
-                                                        <p className="text-gray-600">Render Preview</p>
-                                                        <div className="flex flex-col gap-2 justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
-                                                            <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        case JobStatus.CANCELED:
-                                            return (
-                                                    <div className="flex flex-row items-start justify-center flex-1">
-                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                            <p className="text-gray-400">This print has been canceled.</p>
-                                                            <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Re-Request Print</p>
+                                                                            {
+                                                                                i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
+                                                                            }
+                                                                        </>
+                                                                    )
+                                                                })
+                                                            }
                                                         </div>
 
-                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
-                                                            <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                        <br />
+
+                                                        <div className="flex flex-col gap-2 justify-center flex-1 rounded-md overflow-hidden h-full">
+                                                            <p className="text-gray-600">Render Preview</p>
+                                                            <div className="flex flex-col gap-2 justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    )
-                                        default:
-                                            return (<></>)
-                                    }
-                                })()}
+                                                )
+                                            case JobStatus.CANCELED:
+                                                return (
+                                                        <div className="flex flex-row items-start justify-center flex-1">
+                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                <p className="text-gray-400">This print has been canceled.</p>
+                                                                <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Re-Request Print</p>
+                                                            </div>
 
-                                 <p>{activePrint?.status_history?.map(k => { return (<></>) })}</p>
+                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                            </div>
+                                                        </div>
+                                                )
+                                            default:
+                                                return (<></>)
+                                        }
+                                    })()}
+
+                                    <p>{activePrint?.status_history?.map(k => { return (<></>) })}</p>
+                                </div>
                             </div>
                         </div>
+                            }
                     </div>
                 </div>
             </div>

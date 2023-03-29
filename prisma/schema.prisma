@@ -86,8 +86,14 @@ model Job {
 
   current_status JobStatus     @default(DRAFT)
   status_history Json
+
+  estimated_completion String
+  job_preferences Json
+
   file_url       String
   job_name      String
+  file_name     String
+
   JobMetadata    JobMetadata?
   BidMetadata    BidMetadata[]
 }
@@ -108,6 +114,7 @@ model JobMetadata {
 
 model Bid {
   id String @id @default(cuid())
+  bidder String
 
   created_at DateTime @default(now())
   updated_at DateTime

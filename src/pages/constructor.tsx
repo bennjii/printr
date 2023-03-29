@@ -59,8 +59,8 @@ const Home: NextPage = () => {
                                 isNewInJobQueue ? <div className="h-3 w-3 rounded-full bg-orange-400"></div> : <></>
                                 }
                             </div>
-
-                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>{activePrint?.job_name}</div>
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>Printer List</div>
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 2 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((2))}>Active Print - {activePrint?.job_name}</div>
                         </div>
 
                         <div className={`flex flex-col flex-1 bg-gray-100 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
@@ -98,7 +98,41 @@ const Home: NextPage = () => {
                                                     })
                                                 }
                                             </div>
+                                        </div>
+                                :
+                            activeMenu == 1 ?
+                                        <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
+                                            <div className="flex justify-start flex-col gap-4 place-start" >
+                                                <div className="flex flex-col">
+                                                    <p className="font-bold text-xl">Printer List</p>
+                                                    <p className="text-gray-500">See what all your printers are doing</p>
+                                                </div>
+                                            </div>
 
+                                            <div className="flex flex-col bg-white p-4 px-6 rounded-md flex-1 gap-2">
+                                                {
+                                                                printList.filter(k => k.current_status == 0).map((k, i, a) => {
+                                                                    return (
+                                                                            <>
+                                                                            <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
+                                                                                <p className="font-bold">{k.job_name}</p>
+                                                                                <p className="text-sm text-gray-400">{k.created_at}</p>
+                                                                                <p className="text-sm text-gray-400">{k.job_preferences.colour.name}</p>
+                                                                                <p className="text-sm text-gray-400">{k.job_preferences.delivery.method}</p>
+                                                                                <p className="text-sm text-gray-400">{k.job_preferences.filament.name}</p>
+                                                                                <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
+                                                                                <div></div>
+                                                                                <p className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                            </div>
+
+                                                                            {
+                                                                                i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
+                                                                            }
+                                                                            </>
+                                                                            )
+                                                                })
+                                                            }
+                                            </div>
                                         </div>
                                 :
                                         <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">

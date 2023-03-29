@@ -2,6 +2,14 @@
   "compilerOptions": {
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": ["public/components/*"],
+      "@styles/*": ["styles/*"],
+      "@public/*": ["public/*"],
+      "@lib/*": ["public/lib/*"],
+      "@root/*": ["*"]
+    },
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
@@ -16,10 +24,6 @@
     "jsx": "preserve",
     "incremental": true,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
   },
   "include": [
     ".eslintrc.cjs",

@@ -6,8 +6,11 @@ import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from ".
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
 import Image from "next/image";
+import {useSession} from "next-auth/react";
 
 const Home: NextPage = () => {
+    const { data: session } = useSession();
+
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
     const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
 
@@ -59,7 +62,7 @@ const Home: NextPage = () => {
                         <div className={`flex flex-col flex-1 bg-gray-50 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
                             {
                                 activeMenu == 0 ?
-                                    <div className={`flex flex-1 bg-blue-100 overflow-none flex-col bg-gray-100 bg-opacity-50 rounded-md w-full`}>
+                                    <div className={`flex flex-1 overflow-none flex-col bg-gray-100 rounded-md w-full`}>
                                         <PrintStart
                                             activeMenu={activeMenu} setActiveMenu={setActiveMenu}
                                             printList={rawPrintList} setPrintList={setRawPrintList}
@@ -67,7 +70,7 @@ const Home: NextPage = () => {
                                     </div>
                                 :
 
-                        <div className={`flex overflow-none flex-col bg-gray-100 rounded-md w-full`}>
+                        <div className={`flex flex-1 overflow-none flex-col bg-gray-100 rounded-md w-full`}>
                             <div className={`flex flex-col flex-1`}>
                                 <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
                                     <div className="flex justify-start flex-row items-center justify-between pr-4 gap-4 place-start" >
@@ -147,11 +150,18 @@ const Home: NextPage = () => {
                                                             {
                                                                 DEFAULT_BIDS.map((bid, i, a) => {
                                                                     return (
-                                                                        <>
+                                                                            <>
                                                                             <div key={bid.id} className="flex flex-row items-center gap-2 flex-1 justify-between w-full" style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px" }}>
                                                                                 <p className="font-semibold">{bid.bidder}</p>
                                                                                 <p className="text-gray-600">${bid.price.toFixed(2)}</p>
-                                                                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
+                                                                                <div
+                                                                                    onClick={() => {
+                                                                                        setActivePrint({
+                                                                                            ...activePrint,
+                                                                                            current_status: JobStatus.PREPRINT
+                                                                                        })
+                                                                                    }}
+                                                                                    className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
                                                                                     Accept Bid
                                                                                 </div>
                                                                             </div>

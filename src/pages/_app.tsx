@@ -2,8 +2,8 @@ import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 
-import "~/styles/globals.css";
-import "mapbox-gl/dist/mapbox-gl.css";
+import "@root/src/styles/globals.css";
+//import "mapbox-gl/dist/mapbox-gl.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

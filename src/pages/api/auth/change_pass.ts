@@ -1,7 +1,8 @@
 import { hashPassword, verifyPassword } from "@lib/crpyt";
 import prisma from "@lib/prisma";
+import { NextApiRequest, NextApiResponse } from "next";
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return;
 
     const { email, old_password, new_password } = typeof req.body == "string" ? JSON.parse(req.body) : req.body;
@@ -29,7 +30,7 @@ async function handler(req, res) {
     }
 
     // Hash password, and do same on signup end for identical comparison.
-    const truePass = await verifyPassword(old_password, existingUser.password);
+    const truePass = await verifyPassword(old_password, existingUser.hash);
 
     if(!truePass) {
         res.status(422).json({
@@ -42,7 +43,7 @@ async function handler(req, res) {
 
         const result = await prisma.user.update({
             data: {
-                password: hashed_pass
+                hash: hashed_pass
             },
             where: {
                 id: existingUser.id

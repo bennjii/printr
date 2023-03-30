@@ -36,7 +36,7 @@ const MultiTab: React.FC<Props & NativeAttrs> = ({ tabs, ...args }) => {
 
             <div>
                 {
-                    tabs[current].data
+                    tabs[current]!.data
                 }
             </div>
         </div>

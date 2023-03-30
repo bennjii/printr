@@ -1,21 +1,22 @@
-//import ReactMapboxGl, {Layer, Feature, Image as ImageMBGL, Marker} from 'react-mapbox-gl';
-//import 'mapbox-gl/dist/mapbox-gl.css';
-//import styles from '~/styles/pin.module.css'
-//import "mapbox-gl/dist/mapbox-gl.css";
-//import {createRef, useEffect, useState} from "react";
-//
-//import mapboxgl, {LngLatLike, MapboxOptions} from "mapbox-gl";
-//import {Constructor, from_latlon, MinifiedConstructor} from "../lib/printr";
-//import * as process from "process";
-//
-//interface MapboxMapProps {
-//    initialOptions?: Omit<mapboxgl.MapboxOptions, "container">;
-//    onMapLoaded?(map: mapboxgl.Map): void;
-//    onMapRemoved?(): void;
-//    constructors: MinifiedConstructor[]
-//}
-//
-//export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructors }: MapboxMapProps) => {
+// import ReactMapboxGl, {Layer, Feature, Image as ImageMBGL, Marker} from 'react-mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import styles from '~/styles/pin.module.css'
+import "mapbox-gl/dist/mapbox-gl.css";
+import {createRef, useEffect, useState} from "react";
+
+import mapboxgl, {LngLatLike, MapboxOptions} from "mapbox-gl";
+import {Constructor, from_latlon, MinifiedConstructor} from "../lib/printr";
+import * as process from "process";
+
+interface MapboxMapProps {
+   initialOptions?: Omit<mapboxgl.MapboxOptions, "container">;
+   onMapLoaded?(map: mapboxgl.Map): void;
+   onMapRemoved?(): void;
+   constructors: MinifiedConstructor[]
+}
+
+export const Map = ({ initialOptions = {}, onMapLoaded, onMapRemoved, constructors }: MapboxMapProps) => {
+    return (<div></div>)
 //    const [map, setMap] = useState<mapboxgl.Map>();
 //    const mapNode = createRef<HTMLDivElement>();
 //
@@ -97,4 +98,4 @@
 ////            </MBMap>
 ////        </div>
 ////    )
-//}
+}

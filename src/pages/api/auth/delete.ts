@@ -1,7 +1,8 @@
 import { verifyPassword } from "@lib/crpyt";
 import prisma from "@lib/prisma";
+import { NextApiRequest, NextApiResponse } from "next";
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return;
 
     const { email, password } = typeof req.body == "string" ? JSON.parse(req.body) : req.body;
@@ -29,7 +30,7 @@ async function handler(req, res) {
     }
 
     // Hash password, and do same on signup end for identical comparison.
-    const truePass = await verifyPassword(password, existingUser.password);
+    const truePass = await verifyPassword(password, existingUser.hash);
 
     if(!truePass) {
         res.status(422).json({

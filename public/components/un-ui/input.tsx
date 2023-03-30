@@ -61,12 +61,12 @@ const Input: React.FC<Props & NativeAttrs> = ({ children, callback, ...args }) =
                 <input
                     className="dark:!bg-[#ffffff00]"
                     onChange={() => {
-                        if(input_ref?.current.value.trim().match(mail_format)) setIsValidEmail(true)
+                        if(input_ref?.current!.value.trim().match(mail_format)) setIsValidEmail(true)
                         else setIsValidEmail(false);
                     }}
                     onKeyPress={(e) => {
                         if(e.key == "Enter") {
-                            if(input_ref?.current.value.trim().match(mail_format)) sendAway();
+                            if(input_ref?.current!.value.trim().match(mail_format)) sendAway();
                             else {}
                         }
                     }}

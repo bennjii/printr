@@ -24,15 +24,15 @@ const InputField: React.FC<Props & NativeAttrs> = ({ children, callback, enterCa
                     <>
                         <input
                             tabIndex={0}
-                            onKeyPress={(e) => {
+                            onKeyDown={(e) => {
                                 if(e.key == "Enter") {
-                                    enterCallback(value);
+                                    if(enterCallback) enterCallback(value);
                                 }
                             }}
                             className="flex flex-1 outline-none"
                             onChange={() => {
-                                callback(input_ref.current.value);
-                                setValue(input_ref.current.value);
+                                callback(input_ref.current!.value);
+                                setValue(input_ref.current!.value);
                             }}
                             ref={input_ref}
                             {...args}
@@ -48,7 +48,7 @@ const InputField: React.FC<Props & NativeAttrs> = ({ children, callback, enterCa
                                     <ArrowRight height={16} color={"#b4b4b4"} />
                                 :
                                     <ArrowRight height={16} color={"#252525"} onClick={() => {
-                                        enterCallback(value);
+                                        if(enterCallback) enterCallback(value);
                                     }}/>
                             :
                             <></>

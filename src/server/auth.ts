@@ -4,8 +4,11 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 import { env } from "@root/src/env.mjs";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from '@lib/prisma';
+import CredentialsProvider from "next-auth/providers/credentials";
+import { verifyPassword } from "@public/lib/crpyt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -34,30 +37,66 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-  callbacks: {
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-        // session.user.role = user.role; <-- put other properties on the session here
-      }
-      return session;
-    },
-  },
+  adapter: PrismaAdapter(prisma),
+  session: {
+		strategy: 'jwt',
+		maxAge: 30 * 24 * 60 * 60,
+	},
+  secret: process.env.SECRET,
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    CredentialsProvider({
+			name: "credentials",
+			credentials: {
+				email: { label: "email", type: "email" },
+				password: { label: "password", type: "password" },
+			},
+			async authorize(credentials) {
+				const possibleUser = await prisma.user.findUnique({
+					where: {
+						email: credentials?.email
+					},
+					select: {
+						hash: true
+					}
+				});
+
+				if(!possibleUser) 
+					throw Error("No user exists with this email!");
+
+				const isValid = await verifyPassword(credentials?.password ?? "", possibleUser.hash);
+
+				if(!isValid) 
+					throw Error("Wrong password for account!");
+
+				const user = await prisma.user.findUnique({
+					where: {
+						email: credentials?.email
+					}
+				});
+
+				return user;
+			}
+		}),
   ],
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    jwt: ({ token, user }) => {
+      if(user) token.id = user.id;
+      return token;
+    },
+    session: ({ session, token }) => {
+      if(token) {
+                //@ts-ignore
+        session.id = token.id;
+                //@ts-ignore
+        session.jwt = token;
+      }
+      
+      return session;
+    }
+  }
 };
 
 /**

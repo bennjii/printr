@@ -2,8 +2,9 @@ import { hashPassword } from "@lib/crpyt";
 import prisma from "@lib/prisma";
 
 import { randomUUID } from "crypto";
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return;
 
     const { email, password, name } = req.body;
@@ -33,17 +34,11 @@ async function handler(req, res) {
     await prisma.user.create({
         data: {
             email,
-            password: hashedPassword,
             name,
-            accounts: {
-                create: {
-                    type: "credentials",
-                    provider: "reseda",
-                    providerAccountId: randomUUID(),
-                    tier: "SUPPORTER",
-                    billing_id: customer.id
-                }
-            }
+
+            hash: hashedPassword,
+            is_constructor: false,
+            location: "TBD"
         }
     });
 

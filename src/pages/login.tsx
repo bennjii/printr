@@ -2,17 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from "framer-motion";
 import { cardVariants, subTitleControl } from '@components/framer_constants';
 
-import { getSession, getCsrfToken, signIn as signInAuth, getProviders, useSession } from "next-auth/react";
+import { getSession, getCsrfToken, signIn as signInAuth, getProviders, useSession, ClientSafeProvider } from "next-auth/react";
 import { GetServerSidePropsContext } from 'next';
 
 import InputField from '@components/un-ui/input_field';
 import Button from '@components/un-ui/button';
 
-import { ArrowRight, Check, GitHub  } from 'react-feather';
+import { ArrowRight, Check  } from 'react-feather';
 import { useRouter } from 'next/router';
 import { filter } from "lodash";
 
-export default function Home({ providers }) {
+export default function Home({ providers }: { providers: ClientSafeProvider[] }) {
     const [ authInformation, setAuthInformation ] = useState({
         email: "",
         password: ""
@@ -24,7 +24,7 @@ export default function Home({ providers }) {
     const [ authFailure, setAuthFailure ] = useState("");
     const [ authSuccess, setAuthSuccess ] = useState<"logged_out" | "logged_in" | "login_failure">("logged_out");
 
-    const signIn = async (provider?) => {
+    const signIn = async (provider?: any) => {
         setAwaitingReply(true);
 
         if(provider)
@@ -32,11 +32,13 @@ export default function Home({ providers }) {
                 alert(e);
             });
         else {
-            const { ok, error } = await signInAuth("credentials", {
+            const val = await signInAuth("credentials", {
                 email: authInformation.email,
                 password: authInformation.password,
                 redirect: false,
             });
+
+            const { ok, error } = val!;
 
             setAwaitingReply(false);
 
@@ -47,6 +49,8 @@ export default function Home({ providers }) {
             }else {
                 setAuthSuccess("logged_in");
                 setAuthFailure("");
+
+                router.push("/")
             }
         }
     }
@@ -72,7 +76,7 @@ export default function Home({ providers }) {
                                             placeholder='Email'
                                             type="email"
                                             noArrow={true}
-                                            callback={(email) => {
+                                            callback={(email: string) => {
                                             setAuthInformation({
                                                 ...authInformation,
                                                 email
@@ -87,7 +91,7 @@ export default function Home({ providers }) {
                                             type="password"
                                             placeholder='Password'
                                             noArrow={true}
-                                            callback={(password) => {
+                                            callback={(password: string) => {
                                             setAuthInformation({
                                                 ...authInformation,
                                                 password
@@ -148,7 +152,7 @@ export default function Home({ providers }) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getSession(context);
-    const redirect_url = "/print"
+    const redirect_url = "/"
 
     if (session) {
         return { redirect: { permanent: false, destination: redirect_url } };

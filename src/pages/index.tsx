@@ -1,4 +1,4 @@
-import {type NextPage} from "next";
+import {GetServerSideProps, type NextPage} from "next";
 import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_BIDS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
@@ -6,10 +6,11 @@ import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from ".
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
 import Image from "next/image";
-import {useSession} from "next-auth/react";
+import {getSession, useSession} from "next-auth/react";
+import { Session } from "next-auth";
 
-const Home: NextPage = () => {
-    const { data: session } = useSession();
+const Home: NextPage<{ session: Session }> = ({session}: { session: Session }) => {
+    // if (!session) return <div>User is not logged in, please click <a href="/login">here</a> to login.</div>;
 
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
     const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
@@ -214,5 +215,22 @@ const Home: NextPage = () => {
         </div>
     )
 };
+
+export const  getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getSession(context)
+
+    if(!session) {
+        return {
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            },
+        }
+    }
+
+    return {
+        props: { session }
+    }
+}
 
 export default Home;

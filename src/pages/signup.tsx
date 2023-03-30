@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from "framer-motion";
 import { cardVariants, subTitleControl } from '@components/framer_constants';
 
-import { getSession, getCsrfToken, signIn as signInAuth, getProviders } from "next-auth/react";
+import { getSession, getCsrfToken, signIn as signInAuth, getProviders, ClientSafeProvider } from "next-auth/react";
 import { GetServerSidePropsContext } from 'next';
 
 import InputField from '@components/un-ui/input_field';
@@ -12,7 +12,7 @@ import { ArrowRight, Check, GitHub  } from 'react-feather';
 import { useRouter } from 'next/router';
 import { filter } from "lodash";
 
-export default function Home({ providers }) {
+export default function Home({ providers }: { providers: ClientSafeProvider[] }) {
     const [ authInformation, setAuthInformation ] = useState({
         email: "",
         password: "",
@@ -25,7 +25,7 @@ export default function Home({ providers }) {
     const [ authFailure, setAuthFailure ] = useState("");
     const [ authSuccess, setAuthSuccess ] = useState<"logged_out" | "logged_in" | "login_failure">("logged_out");
 
-    const signIn = async (provider?) => {
+    const signIn = async (provider?: any) => {
         setAwaitingReply(true);
 
         if(provider)
@@ -48,11 +48,13 @@ export default function Home({ providers }) {
             }
 
             if(response.status == 201) {
-                const { ok, error } = await signInAuth("credentials", {
+                const val = await signInAuth("credentials", {
                     email: authInformation.email,
                     password: authInformation.password,
                     redirect: false,
                 });
+
+                const { ok, error } = val!;
 
                 setAwaitingReply(false);
 
@@ -64,7 +66,7 @@ export default function Home({ providers }) {
                     setAuthSuccess("logged_in");
                     setAuthFailure("");
 
-                    router.replace('./profile');
+                    router.replace('/');
                 }
             }else {
                 setAwaitingReply(false);
@@ -77,7 +79,7 @@ export default function Home({ providers }) {
     return (
             <div className="flex-col flex font-sans min-h-screen" > {/* style={{ background: 'linear-gradient(-45deg, rgba(99,85,164,0.2) 0%, rgba(232,154,62,.2) 100%)' }} */}
                 <div className="flex-col flex font-sans min-h-screen w-screen relative overflow-hidden">
-                    <canvas id="gradient-canvas" className="md:top-0 w-full z-10 absolute h-screen" style={{ width: '200%', height: '200%' }} data-transition-in></canvas>
+                    <div id="gradient-canvas" className="md:top-0 w-full z-10 absolute h-screen  bg-blue-400" style={{ width: '200%', height: '200%', zIndex: 0 }} data-transition-in></div>
 
                     <div className="flex-row flex-1 w-screen h-full grid sm:grid-cols-3">
                         <div className="w-full bg-white z-20 flex justify-center items-center flex-col sm:px-72">
@@ -95,12 +97,12 @@ export default function Home({ providers }) {
                                             placeholder='Username'
                                             type="text"
                                             noArrow={true}
-                                            callback={(name) => {
-                                            setAuthInformation({
-                                                ...authInformation,
-                                                name
-                                            })
-                                        }}
+                                            callback={(name: string) => {
+                                                setAuthInformation({
+                                                    ...authInformation,
+                                                    name
+                                                })
+                                            }}
                                         />
                                     </div>
 
@@ -110,12 +112,12 @@ export default function Home({ providers }) {
                                             placeholder='Email'
                                             type="email"
                                             noArrow={true}
-                                            callback={(email) => {
-                                            setAuthInformation({
-                                                ...authInformation,
-                                                email
-                                            })
-                                        }}
+                                            callback={(email: string) => {
+                                                setAuthInformation({
+                                                    ...authInformation,
+                                                    email
+                                                })
+                                            }}
                                         />
                                     </div>
 
@@ -125,12 +127,12 @@ export default function Home({ providers }) {
                                             type="password"
                                             placeholder='Password'
                                             noArrow={true}
-                                            callback={(password) => {
-                                            setAuthInformation({
-                                                ...authInformation,
-                                                password
-                                            })
-                                        }}
+                                            callback={(password: string) => {
+                                                setAuthInformation({
+                                                    ...authInformation,
+                                                    password
+                                                })
+                                            }}
                                             enterCallback={() => signIn()}
                                         />
                                     </div>
@@ -138,18 +140,18 @@ export default function Home({ providers }) {
 
                                 {/* Style This! */}
                                 {
-                                authSuccess == "login_failure" ? (
-                                        <div className="flex flex-row gap-4 items-center rounded-2xl rounded-r-lg">
-                                            <div className="flex items-center justify-center bg-red-100 rounded-full h-8 w-8">
-                                                <p className="text-red-500 font-bold font-altSans">!</p>
-                                            </div>
+                                    authSuccess == "login_failure" ? (
+                                            <div className="flex flex-row gap-4 items-center rounded-2xl rounded-r-lg">
+                                                <div className="flex items-center justify-center bg-red-100 rounded-full h-8 w-8">
+                                                    <p className="text-red-500 font-bold font-altSans">!</p>
+                                                </div>
 
-                                            <p className="text-red-500 font-base font-sans text-sm">
-                                                { authFailure }
-                                            </p>
-                                        </div>
-                                        ) : <></>
-                            }
+                                                <p className="text-red-500 font-base font-sans text-sm">
+                                                    { authFailure }
+                                                </p>
+                                            </div>
+                                    ) : <></>
+                                }
 
                                 <div className="flex flex-row justify-between">
                                     <Button

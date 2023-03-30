@@ -5,6 +5,7 @@ export default async function handle(
         req: NextApiRequest,
         res: NextApiResponse,
 ) {
-  const result = await prisma.user.count();
+  const result = await prisma.user.findMany({
+  });
   return res.status(201).json(result)
 }

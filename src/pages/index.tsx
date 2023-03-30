@@ -11,7 +11,7 @@ import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../server/auth";
 
-type ModSession = {
+export type ModSession = {
     user: {
         name: string,
         email: string,

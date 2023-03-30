@@ -17,7 +17,6 @@ export function getSize(size: string, dp?: number): string {
 
     for (let i = 1; i < sizes.length; i++) {
         if (parseFloat(size) < Math.pow(1000, i))
-            //@ts-ignore
             return (parseFloat(size) / Math.pow(1000, i - 1)).toFixed(dp !== null ? dp : 2).toString() + sizes[i - 1];
     }
 

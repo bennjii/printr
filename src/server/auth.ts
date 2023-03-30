@@ -9,6 +9,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from '@lib/prisma';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { verifyPassword } from "@public/lib/crpyt";
+import { ModSession } from "../pages";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -87,12 +88,14 @@ export const authOptions: NextAuthOptions = {
       if(user) token.id = user.id;
       return token;
     },
-    session: ({ session, token }) => {
+    session: ({ session, token, user }) => {
       if(token) {
-                //@ts-ignore
+        //@ts-ignore
         session.id = token.id;
-                //@ts-ignore
+        //@ts-ignore
         session.jwt = token;
+        //@ts-ignore
+        session.user_info = user;
       }
       
       return session;

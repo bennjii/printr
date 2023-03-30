@@ -11,13 +11,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (
         !email ||
-        !email.includes('@') ||
+        !email.includes('@'))
+        {
+        res.status(422).json({
+            message: 'Email should be properly formatted',
+        });
+        return;
+    }
+        
+    if(
         !password ||
         password.trim().length < 7
     ) {
         res.status(422).json({
         message:
-            'Invalid input - password should also be at least 7 characters long.',
+            'Password should also be at least 7 characters long.',
         });
         return;
     }

@@ -45,7 +45,8 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
 
             if (!response.ok) {
                 setAwaitingReply(false);
-                throw new Error(data.message || 'Something went wrong!');
+                setAuthFailure(data?.message ?? "Authentication Failure");
+                // throw new Error(data.message || 'Something went wrong!');
             }
 
             if(response.status == 201) {

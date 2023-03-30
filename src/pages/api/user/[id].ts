@@ -1,0 +1,24 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import prisma from '@lib/prisma'
+
+// GET /api/user/[id]
+// Required fields in body: name, email
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+    const userId = req.query.id?.toString();
+    console.log("Found Request");
+    const t = new Date().getTime();
+
+    if(String(userId)) {
+        const result = await prisma.user.findUnique({
+            where: {
+                id: String(userId)
+            },
+        });
+
+        console.log("Finished Request in ", new Date().getTime() - t, "ms ");
+
+        res.json(result);
+    }else {
+        res.json({});
+    }
+}

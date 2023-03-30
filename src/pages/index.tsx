@@ -2,23 +2,49 @@ import {GetServerSideProps, type NextPage} from "next";
 import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_BIDS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
-import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from "../../public/lib/printr";
+import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus, User} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
 import Image from "next/image";
 import {getSession, useSession} from "next-auth/react";
 import { Session } from "next-auth";
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../server/auth";
 
-const Home: NextPage<{ session: Session }> = ({session}: { session: Session }) => {
-    // if (!session) return <div>User is not logged in, please click <a href="/login">here</a> to login.</div>;
+type ModSession = {
+    user: {
+        name: string,
+        email: string,
+        image: string
+    }
+    expires: string,
+    id: string,
+    jwt: {
+        name: string,
+        email: string,
+        sub: string,
+        id: string,
+        iat: string
+        exp: string,
+        jti: string
+    }
+}
 
+const Home: NextPage<{ auth: ModSession }> = ({auth}: { auth: ModSession }) => { 
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
-    const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
+    const [ activeUser, setActiveUser ] = useState(auth.user as any as User);    
 
     const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
 
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
+
+    useEffect(() => {
+        fetch(`/api/user/${auth.id}`).then(async val => {
+            const data: User = await val.json();
+            setActiveUser(data);
+        })
+    }, [])
 
     useEffect(() => {
         const diff = rawPrintList.filter(element => !printList.includes(element));
@@ -60,7 +86,7 @@ const Home: NextPage<{ session: Session }> = ({session}: { session: Session }) =
                             <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>{activePrint?.job_name}</div>
                         </div>
 
-                        <div className={`flex flex-col flex-1 bg-gray-50 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
+                        <div className={`flex flex-col flex-1 bg-gray-100 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
                             {
                                 activeMenu == 0 ?
                                     <div className={`flex flex-1 overflow-none flex-col bg-gray-100 rounded-md w-full`}>
@@ -217,10 +243,17 @@ const Home: NextPage<{ session: Session }> = ({session}: { session: Session }) =
 };
 
 export const  getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getSession(context)
+    const metaTags = {
+		"og:title": [`Upload. Print. Collect.`],
+		"og:description": ["Reseda boasts up to 1GB/s real world throughput, affordably pricing, and incredible security."],
+		"og:url": [`https://reseda.app/`],
+	};
+
+    const session = await getServerSession(context.req, context.res, authOptions)
 
     if(!session) {
         return {
+            metaTags,
             redirect: {
                 destination: '/login',
                 permanent: false,
@@ -228,8 +261,15 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
+    session.user.image = session.user.image ?? "";
+
+    console.log(session)
+
     return {
-        props: { session }
+        props: { 
+            metaTags,
+            auth: session
+        }
     }
 }
 

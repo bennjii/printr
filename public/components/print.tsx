@@ -15,7 +15,6 @@ import {
     Constructor, Job, JobStatus, MinifiedConstructor,
     type PrintConfig
 } from "../lib/printr";
-import {Map} from './map'
 
 export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList }:  { activeMenu: number, setActiveMenu: Function, setPrintList: Function, printList: Job[] }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
@@ -393,7 +392,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                                 }
                                             </div>
 
-                                            <Map constructors={FIXED_PRINTER_OPTIONS} />
+                                            {/* <Map constructors={FIXED_PRINTER_OPTIONS} /> */}
                                         </div>
                                     </div>
                                 </div>

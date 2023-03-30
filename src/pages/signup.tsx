@@ -191,7 +191,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getSession(context);
 
     if (session) {
-        return { redirect: { permanent: false, destination: "/print" } };
+        return { redirect: { permanent: false, destination: "/" } };
     }
 
     const csrfToken = await getCsrfToken({ req: context.req });

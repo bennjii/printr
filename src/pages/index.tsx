@@ -30,7 +30,7 @@ type ModSession = {
     }
 }
 
-const Home: NextPage<{ auth: ModSession }> = ({auth}: { auth: ModSession }) => { 
+const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => { 
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
     const [ activeUser, setActiveUser ] = useState(auth.user as any as User);    
 
@@ -253,7 +253,9 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
 
     if(!session) {
         return {
-            metaTags,
+            props: {
+                metaTags
+            },
             redirect: {
                 destination: '/login',
                 permanent: false,

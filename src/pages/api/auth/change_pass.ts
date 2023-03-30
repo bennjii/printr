@@ -41,7 +41,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }else {
         const hashed_pass = await hashPassword(new_password);
 
-        const result = await prisma.user.update({
+        await prisma.user.update({
             data: {
                 hash: hashed_pass
             },

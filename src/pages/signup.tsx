@@ -16,7 +16,8 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
     const [ authInformation, setAuthInformation ] = useState({
         email: "",
         password: "",
-        name: ""
+        name: "",
+        request_constructor: false
     });
 
     const router = useRouter();
@@ -152,6 +153,20 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                             </div>
                                     ) : <></>
                                 }
+
+                                <div onClick={() => {setAuthInformation({ ...authInformation, request_constructor: !authInformation.request_constructor })}} className="flex flex-col gap-2">
+                                    <p className="text-xs text-gray-600 font-semibold">BE A CONSTRUCTOR</p>
+                                    <div className="flex flex-row items-center gap-2 cursor-pointer">
+                                        {
+                                            authInformation.request_constructor  ?
+                                                <div className="flex h-4 w-4 rounded-md border-2 border-gray-700 bg-gray-700" ></div>
+                                            :
+                                                <div className="flex h-4 w-4 rounded-md border-2 border-gray-700"></div>
+                                        }
+
+                                        <p className="font-semibold text-sm text-gray-900 select-none">Yes, I would like to be a constructor</p>
+                                    </div>
+                                </div>
 
                                 <div className="flex flex-row justify-between">
                                     <Button

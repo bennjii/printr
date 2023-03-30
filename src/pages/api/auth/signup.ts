@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return;
 
-    const { email, password, name } = req.body;
+    const { email, password, name, request_constructor } = req.body;
 
     if (
         !email ||
@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             name,
 
             hash: hashedPassword,
-            is_constructor: false,
+            is_constructor: request_constructor,
             location: "TBD"
         }
     });

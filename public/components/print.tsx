@@ -239,7 +239,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                     <div className="flex flex-col gap-8">
                                         <div className="flex flex-col gap-2">
                                             <p className="font-semibold text-sm uppercase">Print</p>
-                                            <div id="" className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                            <div id="" className="flex flex-col gap-2 bg-gray-100 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
@@ -312,7 +312,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                                             </div>
                                         </div>*/}
 
-                                        <div className="flex flex-col gap-1 rounded-md p-2">
+                                        <div className="flex flex-col gap-1 rounded-md">
                                             <div className="flex flex-row items-center gap-2">
                                                 <p className="text-gray-400 text-sm">OPTIONAL: </p>
                                                 <p className="text-gray-600">You may leave a message for your printer</p>

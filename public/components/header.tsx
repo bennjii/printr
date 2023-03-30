@@ -50,7 +50,7 @@ export const Header = ({ activeUser, currentPage }: {  activeUser: User, current
                                     setShowModal(false)
                                 }} 
                                 id="modal-cover"
-                                className="fixed w-screen h-screen" style={{ minWidth: '100vw', minHeight: '100vh', left: 0, top: 0}}>
+                                className="fixed w-screen h-screen text-gray-900" style={{ minWidth: '100vw', minHeight: '100vh', left: 0, top: 0}}>
                                 <div 
                                     onClick={(e) => {
                                         e.stopPropagation()

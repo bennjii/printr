@@ -27,7 +27,8 @@ export type ModSession = {
         iat: string
         exp: string,
         jti: string
-    }
+    },
+    user_info: any
 }
 
 const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => { 
@@ -99,7 +100,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                         <div className={`flex flex-1 overflow-none flex-col bg-gray-100 rounded-md w-full`}>
                             <div className={`flex flex-col flex-1`}>
-                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
+                                <div className="flex flex-col gap-8 flex-1 p-12 flex-1 justify-start">
                                     <div className="flex justify-start flex-row items-center justify-between pr-4 gap-4 place-start" >
                                         <div className="flex flex-col">
                                             <div className="flex flex-row items-center gap-2">
@@ -119,7 +120,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         </div>
                                     </div>
 
-                                    <div id="" className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                                    <div id="" className="flex flex-col gap-2 bg-gray-100 rounded-md" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
                                         <div className="flex flex-col gap-2">
                                             <div className="flex flex-row items-center gap-2"  style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                 <div className="bg-gray-200 px-2 rounded-md font-semibold">
@@ -249,7 +250,7 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
 		"og:url": [`https://reseda.app/`],
 	};
 
-    const session = await getServerSession(context.req, context.res, authOptions)
+    const session: ModSession | null = await getServerSession(context.req, context.res, authOptions);
 
     if(!session) {
         return {
@@ -264,6 +265,7 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     session.user.image = session.user.image ?? "";
+    session.user_info = session.user_info ?? "";
 
     console.log(session)
 

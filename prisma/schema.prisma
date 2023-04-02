@@ -48,7 +48,7 @@ model Constructor {
   name String
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @default(now())
 
   owner_id String @unique
   owner    User   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
@@ -60,10 +60,11 @@ model Constructor {
 
 model Printer {
   id    String @id @default(cuid())
+  name  String 
   model String
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @default(now())
 
   current_status  PrinterStatus    @default(IDLE)
   PrinterMetadata PrinterMetadata?
@@ -82,7 +83,7 @@ model Job {
   id String @id @default(cuid())
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @default(now())
 
   current_status JobStatus     @default(DRAFT)
   status_history Json
@@ -117,7 +118,7 @@ model Bid {
   bidder String
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @default(now())
 
   price       Int
   BidMetadata BidMetadata?

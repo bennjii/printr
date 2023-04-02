@@ -1,3 +1,4 @@
+import { Printer, PrinterStatus } from "@prisma/client";
 import {
     Bid,
     type Colour,
@@ -154,9 +155,52 @@ export const DEFAULT_CONFIG = {
     DANGEROUS_PREFERS_NO_CHECKS: false
 }
 
+export const DEFAULT_PRINTERS: Printer[] = [
+    {
+        id: "FF1",
+        model: "FlashForge Guider IIS V2",
+        name: "FlashForge 1",
+
+        created_at: new Date(),
+        updated_at: new Date(),
+
+        current_status: PrinterStatus.IDLE
+    },
+    {
+        id: "FF2",
+        model: "FlashForge Guider IIS V2",
+        name: "FlashForge 2",
+
+        created_at: new Date(),
+        updated_at: new Date(),
+
+        current_status: PrinterStatus.IDLE
+    },
+    {
+        id: "",
+        model: "Ultimaker 2+ Connect",
+        name: "Ultimaker 2+",
+
+        created_at: new Date(),
+        updated_at: new Date(),
+
+        current_status: PrinterStatus.IDLE
+    },
+    {
+        id: "",
+        model: "Ultimaker S3",
+        name: "Ultimaker S3",
+
+        created_at: new Date(),
+        updated_at: new Date(),
+
+        current_status: PrinterStatus.IDLE
+    }
+];
+
 export const DEFAULT_PRINT_JOBS: Job[] = [
     {
-        id: "ngoi101je01",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",
@@ -183,7 +227,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     },
     {
-        id: "v1ijn0e8012n",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",
@@ -210,7 +254,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     },
     {
-        id: "ain29h3j0wbg",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",
@@ -237,7 +281,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     },
     {
-        id: "abnauneoan",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",
@@ -264,7 +308,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     },
     {
-        id: "1ub2e8b19gj1",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",
@@ -291,7 +335,7 @@ export const DEFAULT_PRINT_JOBS: Job[] = [
         }
     },
     {
-        id: "aoin2e10n01t",
+        id: "abcdef",
 
         created_at: "2023-03-27",
         updated_at: "2023-03-27",

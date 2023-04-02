@@ -83,6 +83,7 @@ export type Constructor = {
 export type Printer = {
     id: string,
     model: string,
+    name: string,
 
     created_at: string,
     updated_at: string,

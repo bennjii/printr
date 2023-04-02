@@ -1,20 +1,37 @@
-import {type NextPage} from "next";
-import {useEffect, useState} from "react";
-import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
+import {GetServerSideProps, type NextPage} from "next";
+import {createRef, useEffect, useState} from "react";
+import {DEFAULT_PRINTERS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
 import {type Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
+import { Printer } from "@prisma/client";
+import { ModSession } from ".";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../server/auth";
 
-const Home: NextPage = () => {
+const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => { 
     const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
     const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
 
     const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+    const [ printers, setPrinters ] = useState<Printer[]>(DEFAULT_PRINTERS);
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
 
-    const [ isNewInJobQueue, setIsNewInJobQueue ] = useState(true);
+    const [ offerModal, setOfferModal ] = useState<{
+        active: boolean,
+        job_id: string | null,
+        value: number
+    }>({
+        active: false,
+        job_id: null,
+        value: 0.0
+    });
 
+    const [ isNewInJobQueue, setIsNewInJobQueue ] = useState(true);
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
+    const [ isLoading, setIsLoading ] = useState(false);
+
+    const offer_ref = createRef<HTMLInputElement>();
 
     useEffect(() => {
         setIsNewInJobQueue(false)
@@ -33,6 +50,78 @@ const Home: NextPage = () => {
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
                 <Header activeUser={activeUser} currentPage="CONST" />
+
+                {
+                    offerModal.active ?
+                    <div
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setOfferModal({ ...offerModal, active: false });
+                        }} 
+                        id="modal-cover"
+                        className="z-50 fixed flex items-center bg-gray-900 bg-opacity-50 backdrop-blur-sm justify-center w-screen h-screen text-gray-900" style={{ minWidth: '100vw', minHeight: '100vh', left: 0, top: 0}}>
+                        <div 
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }} 
+                            id="modal"
+                            className="bg-white flex flex-col items-center gap-4 p-8 rounded-md min-w-[400px]">
+                            <div className="flex flex-col flex-start justify-start items-start pr-32 w-full">
+                                <p className="font-bold text-xl">Make Offer</p>
+                                <p className="text-gray-500">{activePrint?.file_name}</p>
+                            </div>
+
+                            <div className="w-full flex flex-col flex-1">
+                                <p className="text-gray-600 uppercase text-sm">Offer Value</p>
+                                <input ref={offer_ref} placeholder="$15.00" className="px-4 py-2 rounded-md bg-gray-100" onChange={(e) => {
+                                    setOfferModal({ ...offerModal, value: parseFloat(e.target.value) });
+                                }}></input>
+                            </div>
+
+                            <div className="w-full flex flex-col flex-1">
+                                <p className="text-gray-600 uppercase text-sm">Allocate Printer</p>
+                                <select className="px-4 py-2 rounded-md bg-gray-100">
+                                    {
+                                        printers.map(k => {
+                                            return (
+                                                <option className="px-4 py-2 rounded-md">{k.current_status} - {k.name}</option>
+                                            )
+                                        })
+                                    }
+                                </select>
+                            </div>
+
+                            <br />
+
+                            <div 
+                                onClick={() => {
+                                    if(!isLoading) {
+                                        setIsLoading(true)
+                                        fetch(`/api/offer/create`, {
+                                            method: "POST",
+                                            body: JSON.stringify({
+                                                user_id: auth.id,
+                                                job_id: offerModal.job_id,
+                                                offer_value: offerModal.value
+                                            })
+                                        }).then(async val => {
+                                            const data = await val.json();
+                                            console.log("Bid", data);
+                                            
+                                            setOfferModal({ ...offerModal, active: false })
+                                        });
+                                    }
+                                }}
+                                className={`text-sm text-center cursor-pointer font-semibold ${ isLoading ? "bg-green-50 text-green-800 text-opacity-50" : "bg-green-100 text-green-800" } items-center justify-center p-2 rounded-md w-full flex-1 flex`}>
+                                    {
+                                        isLoading ? "Placing Offer..." : "Confirm Offer"
+                                    }
+                                </div>
+                        </div>
+                    </div>
+                    :
+                    <></>
+                }
 
                 <div className="flex flex-row flex-1 w-full p-8 gap-8">
                     <div className="flex flex-1 flex-col gap-2 min-w-[300px] max-w-[300px]">
@@ -87,7 +176,11 @@ const Home: NextPage = () => {
                                                                     <p className="text-sm text-gray-400">{k.job_preferences.filament.name}</p>
                                                                     <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
                                                                     <div></div>
-                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                    <p 
+                                                                        onClick={() => {
+                                                                            setOfferModal({ ...offerModal, active: true, job_id: k.id })
+                                                                        }}
+                                                                        className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
                                                                 </div>
 
                                                                 {
@@ -111,27 +204,24 @@ const Home: NextPage = () => {
 
                                             <div className="flex flex-col bg-white p-4 px-6 rounded-md flex-1 gap-2">
                                                 {
-                                                                printList.filter(k => k.current_status == 0).map((k, i, a) => {
-                                                                    return (
-                                                                            <>
-                                                                            <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
-                                                                                <p className="font-bold">{k.job_name}</p>
-                                                                                <p className="text-sm text-gray-400">{k.created_at}</p>
-                                                                                <p className="text-sm text-gray-400">{k.job_preferences.colour.name}</p>
-                                                                                <p className="text-sm text-gray-400">{k.job_preferences.delivery.method}</p>
-                                                                                <p className="text-sm text-gray-400">{k.job_preferences.filament.name}</p>
-                                                                                <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
-                                                                                <div></div>
-                                                                                <p className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
-                                                                            </div>
+                                                    printers.map((k, i, a) => {
+                                                        return (
+                                                            <>
+                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
+                                                                    <p className="font-bold">{k.id}</p>
+                                                                    <p className="text-sm text-gray-400">{k.created_at.toDateString()}</p>
+                                                                    <p className="text-sm text-gray-400">{k.current_status}</p>
+                                                                    <div></div>
+                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                </div>
 
-                                                                            {
-                                                                                i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
-                                                                            }
-                                                                            </>
-                                                                            )
-                                                                })
-                                                            }
+                                                                {
+                                                                    i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
+                                                                }
+                                                            </>
+                                                        )
+                                                    })
+                                                }
                                             </div>
                                         </div>
                                 :
@@ -190,5 +280,39 @@ const Home: NextPage = () => {
         </div>
     )
 };
+
+export const  getServerSideProps: GetServerSideProps = async (context) => {
+    const metaTags = {
+		"og:title": [`Upload. Print. Collect.`],
+		"og:description": ["Reseda boasts up to 1GB/s real world throughput, affordably pricing, and incredible security."],
+		"og:url": [`https://reseda.app/`],
+	};
+
+    const session: ModSession | null = await getServerSession(context.req, context.res, authOptions);
+
+    if(!session) {
+        return {
+            props: {
+                metaTags
+            },
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            },
+        }
+    }
+
+    session.user.image = session.user.image ?? "";
+    session.user_info = session.user_info ?? "";
+
+    console.log(session)
+
+    return {
+        props: { 
+            metaTags,
+            auth: session
+        }
+    }
+}
 
 export default Home;

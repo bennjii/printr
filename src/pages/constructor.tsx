@@ -1,21 +1,21 @@
 import {GetServerSideProps, type NextPage} from "next";
 import {createRef, useEffect, useState} from "react";
 import {DEFAULT_PRINTERS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
-import {type Job, job_status_to_colour_pair, job_status_to_string, JobStatus} from "../../public/lib/printr";
+import {job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
-import { Printer } from "@prisma/client";
+import { Job, Printer, User } from "@prisma/client";
 import { ModSession } from ".";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../server/auth";
 
-const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => { 
-    const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
-    const [ activeUser, setActiveUser ] = useState(DEFAULT_USER);
+const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => {
+    const [ activePrint, setActivePrint ] = useState<Job | null>(null);
+    const [ activeUser, setActiveUser ] = useState(auth.user as any as User);
 
-    const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+    const [ printList, setPrintList ] = useState<Job[]>([]);
     const [ printers, setPrinters ] = useState<Printer[]>(DEFAULT_PRINTERS);
-    const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+    const [ rawPrintList, setRawPrintList ] = useState<Job[]>([]);
 
     const [ offerModal, setOfferModal ] = useState<{
         active: boolean,
@@ -26,6 +26,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         job_id: null,
         value: 0.0
     });
+
+    useEffect(() => {
+        fetch(`/api/user/${auth.id}`).then(async val => {
+            const data: User = await val.json();
+            setActiveUser(data);
+        });
+
+        fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+            const data: Job[] = await val.json();
+            setRawPrintList(data);
+            setPrintList(data);
+            setActivePrint(data?.at(0) ?? null);
+        });
+    }, [])
 
     const [ isNewInJobQueue, setIsNewInJobQueue ] = useState(true);
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
@@ -41,10 +55,10 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         const diff = rawPrintList.filter(element => !printList.includes(element));
 
         if(diff.length > 0) {
-            setActivePrint(diff[0])
+            setActivePrint(diff[0] ?? null)
         }
 
-        setPrintList([ ...rawPrintList.sort((a, b) => a.current_status - b.current_status) ])
+        setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
     }, [rawPrintList]);
 
     return (
@@ -57,13 +71,13 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                         onClick={(e) => {
                             e.stopPropagation()
                             setOfferModal({ ...offerModal, active: false });
-                        }} 
+                        }}
                         id="modal-cover"
                         className="z-50 fixed flex items-center bg-gray-900 bg-opacity-50 backdrop-blur-sm justify-center w-screen h-screen text-gray-900" style={{ minWidth: '100vw', minHeight: '100vh', left: 0, top: 0}}>
-                        <div 
+                        <div
                             onClick={(e) => {
                                 e.stopPropagation()
-                            }} 
+                            }}
                             id="modal"
                             className="bg-white flex flex-col items-center gap-4 p-8 rounded-md min-w-[400px]">
                             <div className="flex flex-col flex-start justify-start items-start pr-32 w-full">
@@ -93,7 +107,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                             <br />
 
-                            <div 
+                            <div
                                 onClick={() => {
                                     if(!isLoading) {
                                         setIsLoading(true)
@@ -107,7 +121,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         }).then(async val => {
                                             const data = await val.json();
                                             console.log("Bid", data);
-                                            
+
                                             setOfferModal({ ...offerModal, active: false })
                                         });
                                     }
@@ -129,17 +143,16 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                         {/* All of the prints in queue */}
                         {
-                            printList.filter(k => k.current_status != 7 && k.current_status != 0).filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
 
                         <br />
 
                         <p className="text-gray-600">Inactive Jobs</p>
                         {
-                            printList.filter(k => k.current_status != 7).filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
                     </div>
-
                     <div className={`flex flex-col flex-1 py-[32px] pb-0`}>
                         <div className="flex flex-row items-center gap-2">
                             <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 0 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu(0)}>
@@ -165,18 +178,18 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                                             <div className="flex flex-col bg-white p-4 px-6 rounded-md flex-1 gap-2">
                                                 {
-                                                    printList.filter(k => k.current_status == 0).map((k, i, a) => {
+                                                    printList.filter(k => job_status_to_type(k.current_status) == 0).map((k, i, a) => {
                                                         return (
                                                             <>
                                                                 <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
                                                                     <p className="font-bold">{k.job_name}</p>
-                                                                    <p className="text-sm text-gray-400">{k.created_at}</p>
-                                                                    <p className="text-sm text-gray-400">{k.job_preferences.colour.name}</p>
-                                                                    <p className="text-sm text-gray-400">{k.job_preferences.delivery.method}</p>
-                                                                    <p className="text-sm text-gray-400">{k.job_preferences.filament.name}</p>
+                                                                    <p className="text-sm text-gray-400">{k.created_at.toString()}</p>
+                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).colour.name}</p>
+                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).delivery.method}</p>
+                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).filament.name}</p>
                                                                     <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
                                                                     <div></div>
-                                                                    <p 
+                                                                    <p
                                                                         onClick={() => {
                                                                             setOfferModal({ ...offerModal, active: true, job_id: k.id })
                                                                         }}
@@ -207,12 +220,12 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                     printers.map((k, i, a) => {
                                                         return (
                                                             <>
-                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
-                                                                    <p className="font-bold">{k.id}</p>
+                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "1fr 50px 150px 1fr 100px" }}>
+                                                                    <p className="font-bold">{k.name}</p>
+                                                                    <p className="text-sm text-gray-600">{k.current_status}</p>
                                                                     <p className="text-sm text-gray-400">{k.created_at.toDateString()}</p>
-                                                                    <p className="text-sm text-gray-400">{k.current_status}</p>
                                                                     <div></div>
-                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">Idle Printer</p>
                                                                 </div>
 
                                                                 {
@@ -230,7 +243,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                 <div className="flex flex-col">
                                                     <div className="flex flex-row items-center gap-2">
                                                         <p className="font-bold text-xl">{activePrint?.job_name}</p>
-                                                        <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint?.current_status ?? JobStatus.DRAFT)}`}>{job_status_to_string(activePrint?.current_status ?? JobStatus.DRAFT)}</p>
+                                                        <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(job_status_to_type(activePrint?.current_status ?? "") ?? JobStatus.DRAFT)}`}>{job_status_to_string(job_status_to_type(activePrint?.current_status ?? "") ?? JobStatus.DRAFT)}</p>
                                                     </div>
 
                                                     <p className="text-gray-500">{activePrint?.file_name}</p>
@@ -250,7 +263,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Colour:
                                                         </div>
-                                                        {activePrint?.job_preferences?.colour?.name}
+                                                        {(activePrint?.job_preferences as any as PrintConfig)?.colour?.name}
                                                     </div>
                                                 </div>
 
@@ -259,19 +272,19 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Filament:
                                                         </div>
-                                                        {activePrint?.job_preferences?.filament?.name}
+                                                        {(activePrint?.job_preferences as any as PrintConfig)?.filament?.name}
                                                     </div>
 
                                                     <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                         <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                             Delivery Method:
                                                         </div>
-                                                        {activePrint?.job_preferences?.delivery?.method}
+                                                        {(activePrint?.job_preferences as any as PrintConfig)?.delivery?.method}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <p>{activePrint?.status_history?.map(k => { return ( <></> ) })}</p>
+                                            {/* <p>{activePrint?.status_history?.map(k => { return ( <></> ) })}</p> */}
                                     </div>
                             }
                     </div>
@@ -308,7 +321,7 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
     console.log(session)
 
     return {
-        props: { 
+        props: {
             metaTags,
             auth: session
         }

@@ -9,19 +9,20 @@ import {
     getSize
 } from "../lib/helpers";
 import {
-    capitalise_first_letter,
     Completeness,
-    completeness_as_string,
-    Constructor, Job, JobStatus, MinifiedConstructor,
+    JobStatus, MinifiedConstructor,
     type PrintConfig
 } from "../lib/printr";
 
-export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList }:  { activeMenu: number, setActiveMenu: Function, setPrintList: Function, printList: Job[] }) => {
+import { Job, Job as JobDBType } from "@prisma/client"
+import prisma from "@public/lib/prisma";
+
+export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList, user_id }:  { activeMenu: number, setActiveMenu: Function, setPrintList: Function, printList: Job[], user_id: string }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
 
-    const [ currentJob, setCurrentJob ] = useState<null | Job>(null);
+    const [ currentJob, setCurrentJob ] = useState<null | JobDBType>(null);
     const [ waiting, setWaiting ] = useState<boolean>(false);
 
     const [ config, setConfig ] = useState<PrintConfig>({ ...JSON.parse(JSON.stringify((DEFAULT_CONFIG))) });
@@ -434,34 +435,41 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList 
                         }else if(print_mode == CONFIRM_PRINT_MODE) {
                             setWaiting(true);
 
-                            setTimeout(() => {
-                                const new_job: Job = {
-                                    id: (Math.random() * 10000).toString(),
+                            const new_job: JobDBType = {
+                                id: (Math.random() * 10000).toString(),
 
-                                    created_at: new Date().toISOString(),
-                                    updated_at: new Date().toISOString(),
+                                created_at: new Date(),
+                                updated_at: new Date(),
 
-                                    current_status: JobStatus.BIDDING,
-                                    status_history: [
-                                        {
-                                            value: JobStatus.BIDDING,
-                                            timestamp: new Date().toISOString()
-                                        }
-                                    ],
-                                    estimated_completion: null,
+                                current_status: "BIDDING",
+                                status_history: [
+                                    {
+                                        value: JobStatus.BIDDING,
+                                        timestamp: new Date().toISOString()
+                                    }
+                                ],
 
-                                    file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
-                                    file_name: config.files.map(k => k.name).join(', '),
-                                    job_name: config.files.map(k => k.name).join(', ').split('.')[0] ?? "",
+                                estimated_completion: "",
 
-                                    job_preferences: config
-                                };
+                                file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
+                                file_name: config.files.map(k => k.name).join(', '),
+                                job_name: config.files.map(k => k.name).join(', ').split('.')[0] ?? "",
 
+                                job_preferences: config,
+                                submitter_id: user_id,
+                                constructor_id: null,
+                                printer_id: null
+                            };
+
+                            fetch(`/api/jobs/create`, {
+                                method: "POST",
+                                body: JSON.stringify(new_job)
+                            }).then(b => {
                                 setCurrentJob(new_job);
                                 setPrintList([ ...printList, new_job ]);
                                 setPrintMode(5);
                                 setWaiting(false);
-                            }, 3000);
+                            });
                         }else {
                             setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : print_mode == 2 && can_continue ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
                         }

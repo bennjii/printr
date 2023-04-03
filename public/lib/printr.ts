@@ -26,6 +26,29 @@ export const job_status_to_string = (status: JobStatus) => {
     }
 }
 
+export const job_status_to_type = (status: string) => {
+    switch(status) {
+        case "BIDDING":
+            return JobStatus.BIDDING
+        case "CANCELED":
+            return JobStatus.CANCELED
+        case "COMPLETE":
+            return JobStatus.COMPLETE
+        case "DRAFT":
+            return JobStatus.DRAFT
+        case "ENROUTE":
+            return JobStatus.ENROUTE
+        case "PREDELIVERY":
+            return JobStatus.PREDELIVERY
+        case "PREPRINT":
+            return JobStatus.PREPRINT
+        case "PRINTING":
+            return JobStatus.PRINTING
+    }
+
+    return JobStatus.BIDDING
+}
+
 export const job_status_to_colour_pair = (status: JobStatus) => {
     return status == JobStatus.PRINTING ? "bg-green-100 text-green-800" : status == JobStatus.BIDDING ? "bg-orange-100 text-orange-800" : status == JobStatus.CANCELED ? "bg-red-100 text-red-800" : status == JobStatus.ENROUTE ? "bg-yellow-100 text-yellow-800" : status == JobStatus.PREPRINT ? "bg-yellow-100 text-yellow-800" : status == JobStatus.COMPLETE ? "bg-green-100 text-green-800" : status == JobStatus.DRAFT ? "bg-orange-100 text-orange-800" : status == JobStatus.PREDELIVERY ? "bg-gray-400 text-gray-800" : "bg-gray-400 text-gray-800"
 }

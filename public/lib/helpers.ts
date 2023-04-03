@@ -3,7 +3,6 @@ import {
     Bid,
     type Colour,
     Completeness,
-    Constructor,
     DeliveryMethod,
     type Filament,
     Job,
@@ -177,7 +176,7 @@ export const DEFAULT_PRINTERS: Printer[] = [
         current_status: PrinterStatus.IDLE
     },
     {
-        id: "",
+        id: "UltiMakS3-1",
         model: "Ultimaker 2+ Connect",
         name: "Ultimaker 2+",
 
@@ -187,7 +186,7 @@ export const DEFAULT_PRINTERS: Printer[] = [
         current_status: PrinterStatus.IDLE
     },
     {
-        id: "",
+        id: "UltiMakS3-1",
         model: "Ultimaker S3",
         name: "Ultimaker S3",
 

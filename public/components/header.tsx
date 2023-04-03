@@ -1,7 +1,7 @@
 import { useState } from "react";
-import {User} from "../lib/printr";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import { User } from "@prisma/client";
 
 export const Header = ({ activeUser, currentPage }: {  activeUser: User, currentPage: String }) => {
     const [ showModal, setShowModal ] = useState(false);

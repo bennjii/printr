@@ -2,7 +2,7 @@ import {GetServerSideProps, type NextPage} from "next";
 import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_BIDS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
-import {Job, job_status_to_colour_pair, job_status_to_string, JobStatus, User} from "../../public/lib/printr";
+import {History, job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import {getSession, useSession} from "next-auth/react";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../server/auth";
+import { Job, User } from "@prisma/client";
 
 export type ModSession = {
     user: {
@@ -31,12 +32,12 @@ export type ModSession = {
     user_info: any
 }
 
-const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => { 
-    const [ activePrint, setActivePrint ] = useState(DEFAULT_PRINT_JOBS[0]);
-    const [ activeUser, setActiveUser ] = useState(auth.user as any as User);    
+const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => {
+    const [ activePrint, setActivePrint ] = useState<Job | null>(DEFAULT_PRINT_JOBS[0] as any as Job);
+    const [ activeUser, setActiveUser ] = useState(auth.user as any as User);
 
-    const [ printList, setPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
-    const [ rawPrintList, setRawPrintList ] = useState<Job[]>(DEFAULT_PRINT_JOBS);
+    const [ printList, setPrintList ] = useState<Job[]>([]);
+    const [ rawPrintList, setRawPrintList ] = useState<Job[]>([]);
 
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
 
@@ -44,18 +45,25 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         fetch(`/api/user/${auth.id}`).then(async val => {
             const data: User = await val.json();
             setActiveUser(data);
-        })
+        });
+
+        fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+            const data: Job[] = await val.json();
+            setRawPrintList(data);
+            setPrintList(data);
+            setActivePrint(data?.at(0) ?? null);
+        });
     }, [])
 
-    useEffect(() => {
-        const diff = rawPrintList.filter(element => !printList.includes(element));
+    // useEffect(() => {
+    //     const diff = rawPrintList.filter(element => !printList.includes(element));
 
-        if(diff.length > 0) {
-            setActivePrint(diff[0])
-        }
+    //     if(diff.length > 0) {
+    //         setActivePrint(diff[0])
+    //     }
 
-        setPrintList([ ...rawPrintList.sort((a, b) => a.current_status - b.current_status) ])
-    }, [rawPrintList]);
+    //     setPrintList([ ...rawPrintList.sort((a, b) => a.current_status - b.current_status) ])
+    // }, [rawPrintList]);
 
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
@@ -64,17 +72,16 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                 <div className="flex flex-row flex-1 w-full p-8 gap-8">
                     <div className="flex flex-1 flex-col gap-2 min-w-[300px] max-w-[300px]">
                         <p className="text-gray-600">Current Prints</p>
-
                         {/* All of the prints in queue */}
                         {
-                            printList.filter(k => k.current_status < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
 
                         <br />
 
                         <p className="text-gray-600">Old Prints</p>
                         {
-                            printList.filter(k => k.current_status >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                         }
                     </div>
 
@@ -94,6 +101,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         <PrintStart
                                             activeMenu={activeMenu} setActiveMenu={setActiveMenu}
                                             printList={rawPrintList} setPrintList={setRawPrintList}
+                                            user_id={auth.id}
                                         />
                                     </div>
                                 :
@@ -105,14 +113,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         <div className="flex flex-col">
                                             <div className="flex flex-row items-center gap-2">
                                                 <p className="font-bold text-xl">{activePrint?.job_name}</p>
-                                                <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(activePrint?.current_status ?? JobStatus.DRAFT)}`}>{job_status_to_string(activePrint?.current_status ?? JobStatus.DRAFT)}</p>
+                                                <p className={`px-4 py-0 rounded-md ${job_status_to_colour_pair(job_status_to_type(activePrint?.current_status ?? "") ?? JobStatus.DRAFT)}`}>{job_status_to_string(job_status_to_type(activePrint?.current_status ?? "") ?? JobStatus.DRAFT)}</p>
                                             </div>
                                             <p className="text-gray-500">{activePrint?.file_name}</p>
                                         </div>
 
                                         <div>
                                             {
-                                                activePrint?.current_status == JobStatus.DRAFT ?
+                                                job_status_to_type(activePrint?.current_status ?? "") == JobStatus.DRAFT ?
                                                     <div className="px-4 py-1 bg-gray-100 rounded-md cursor-pointer">Edit</div>
                                                     :
                                                     <></>
@@ -133,7 +141,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                 <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                     Colour:
                                                 </div>
-                                                {activePrint?.job_preferences?.colour?.name}
+                                                {(activePrint?.job_preferences as any as PrintConfig)?.colour?.name}
                                             </div>
                                         </div>
 
@@ -142,20 +150,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                 <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                     Filament:
                                                 </div>
-                                                {activePrint?.job_preferences?.filament?.name}
+                                                {(activePrint?.job_preferences as any as PrintConfig)?.filament?.name}
                                             </div>
 
                                             <div className="flex flex-row items-center gap-2" style={{ display: 'grid', gridTemplateColumns: '40% 1fr' }}>
                                                 <div className="bg-gray-200 px-2 rounded-md font-semibold">
                                                     Delivery Method:
                                                 </div>
-                                                {activePrint?.job_preferences?.delivery?.method}
+                                                {(activePrint?.job_preferences as any as PrintConfig)?.delivery?.method}
                                             </div>
                                         </div>
                                     </div>
 
                                     {(() => {
-                                        switch(activePrint?.current_status) {
+                                        switch(job_status_to_type(activePrint?.current_status ?? "")) {
                                             case JobStatus.DRAFT:
                                                 return (
                                                         <div className="flex flex-row items-start justify-center flex-1">
@@ -186,8 +194,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     onClick={() => {
                                                                                         setActivePrint({
                                                                                             ...activePrint,
-                                                                                            current_status: JobStatus.PREPRINT
-                                                                                        })
+                                                                                            current_status: "PREPRINT"
+                                                                                        } as Job)
                                                                                     }}
                                                                                     className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
                                                                                     Accept Bid
@@ -231,7 +239,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         }
                                     })()}
 
-                                    <p>{activePrint?.status_history?.map(k => { return (<></>) })}</p>
+                                    <p>{(activePrint?.status_history as any as History<JobStatus>[])?.map(k => { return (<></>) })}</p>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +278,7 @@ export const  getServerSideProps: GetServerSideProps = async (context) => {
     console.log(session)
 
     return {
-        props: { 
+        props: {
             metaTags,
             auth: session
         }

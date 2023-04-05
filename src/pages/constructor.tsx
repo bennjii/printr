@@ -143,14 +143,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
     
                                                     fetch(`/api/jobs/user/${auth.id}`).then(async val => {
                                                         const data: Job[] = await val.json();
-                                                        setRawPrintList(data);
-                                                        setPrintList(data);
+                                                        setRawPrintList([ ...data ]);
+                                                        setPrintList([ ...data ]);
                                                         setActivePrint(data?.at(0) ?? null);
                                                     });
                                             
                                                     fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
                                                         const data: Printer[] = await val.json();
-                                                        setPrinters(data);
+                                                        setPrinters([ ...data ]);
                                                     });
     
                                                     setIsLoading(false)
@@ -279,58 +279,61 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                                             <div className="flex flex-col bg-white p-4 px-6 rounded-md flex-1 gap-2">
                                                 {
-                                                    printList.filter(k => job_status_to_type(k.current_status) == 0).map((k, i, a) => {
-                                                        return (
-                                                            <>
-                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 175px 90px 75px 50px 1fr" }}>
-                                                                    <p className="font-bold">{k.job_name}</p>
-                                                                    <p className="text-sm text-gray-400">{new Date(k.created_at).toLocaleString()}</p>
-                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).colour.name}</p>
-                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).delivery.method}</p>
-                                                                    <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).filament.name}</p>
+                                                    printList.filter(k => job_status_to_type(k.current_status) == 0).length > 0 ?
+                                                        printList.filter(k => job_status_to_type(k.current_status) == 0).map((k, i, a) => {
+                                                            return (
+                                                                <>
+                                                                    <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 175px 90px 75px 50px 1fr" }}>
+                                                                        <p className="font-bold">{k.job_name}</p>
+                                                                        <p className="text-sm text-gray-400">{new Date(k.created_at).toLocaleString()}</p>
+                                                                        <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).colour.name}</p>
+                                                                        <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).delivery.method}</p>
+                                                                        <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).filament.name}</p>
 
-                                                                    <div className="flex flex-col gap-2">
-                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
-                                                                    {
-                                                                        //@ts-ignore
-                                                                        k.Bids?.filter((k: Bid) => k.bidder_id == auth.id).length > 0 ?
-                                                                        <p
-                                                                        onClick={() => {
+                                                                        <div className="flex flex-col gap-2">
+                                                                        <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
+                                                                        {
                                                                             //@ts-ignore
-                                                                            fetch(`/api/offer/${k.Bids?.filter((k: Bid) => k.bidder_id == auth.id)[0].id}`).then(async b => {
-                                                                                const bid: Bid = await b.json();
-                                                                                console.log("OPEN BID", bid);
+                                                                            k.Bids?.filter((k: Bid) => k.bidder_id == auth.id).length > 0 ?
+                                                                            <p
+                                                                            onClick={() => {
+                                                                                //@ts-ignore
+                                                                                fetch(`/api/offer/${k.Bids?.filter((k: Bid) => k.bidder_id == auth.id)[0].id}`).then(async b => {
+                                                                                    const bid: Bid = await b.json();
+                                                                                    console.log("OPEN BID", bid);
 
-                                                                                setOfferModal({ 
-                                                                                    ...offerModal, 
-                                                                                    active: true, 
-                                                                                    type: "delete", 
-                                                                                    job_id: k.id,
-                                                                                    value: bid.price,
-                                                                                    bid_id: bid.id,
-                                                                                    //@ts-ignore
-                                                                                    printer: bid.printer_id
-                                                                                })
-                                                                            });
-                                                                            
-                                                                        }}
-                                                                        className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">Modify Offer</p>
-                                                                        :
-                                                                        <p
-                                                                        onClick={() => {
-                                                                            setOfferModal({ ...offerModal, active: true, type: "create", job_id: k.id, value: 0 })
-                                                                        }}
-                                                                        className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
-                                                                    }
+                                                                                    setOfferModal({ 
+                                                                                        ...offerModal, 
+                                                                                        active: true, 
+                                                                                        type: "delete", 
+                                                                                        job_id: k.id,
+                                                                                        value: bid.price,
+                                                                                        bid_id: bid.id,
+                                                                                        //@ts-ignore
+                                                                                        printer: bid.printer_id
+                                                                                    })
+                                                                                });
+                                                                                
+                                                                            }}
+                                                                            className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">Modify Offer</p>
+                                                                            :
+                                                                            <p
+                                                                            onClick={() => {
+                                                                                setOfferModal({ ...offerModal, active: true, type: "create", job_id: k.id, value: 0 })
+                                                                            }}
+                                                                            className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                        }
+                                                                        </div>
                                                                     </div>
-                                                                </div>
 
-                                                                {
-                                                                    i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
-                                                                }
-                                                            </>
-                                                        )
-                                                    })
+                                                                    {
+                                                                        i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
+                                                                    }
+                                                                </>
+                                                            )
+                                                        })
+                                                    :
+                                                        <p className="text-gray-400 w-full text-center p-8">No active jobs</p>
                                                 }
                                             </div>
                                         </div>

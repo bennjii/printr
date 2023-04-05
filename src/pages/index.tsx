@@ -40,6 +40,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>([]);
 
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
+    const [ isLoading, setIsLoading ] = useState(false);
 
     useEffect(() => {
         fetch(`/api/user/${auth.id}`).then(async val => {
@@ -55,15 +56,16 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         });
     }, [])
 
-    // useEffect(() => {
-    //     const diff = rawPrintList.filter(element => !printList.includes(element));
+    useEffect(() => {
+        const diff = rawPrintList.filter(element => !printList.includes(element));
 
-    //     if(diff.length > 0) {
-    //         setActivePrint(diff[0])
-    //     }
+        if(diff.length > 0) {
+            //@ts-ignore
+            setActivePrint(diff[0])
+        }
 
-    //     setPrintList([ ...rawPrintList.sort((a, b) => a.current_status - b.current_status) ])
-    // }, [rawPrintList]);
+        setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
+    }, [rawPrintList]);
 
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
@@ -107,6 +109,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         <PrintStart
                                             activeMenu={activeMenu} setActiveMenu={setActiveMenu}
                                             printList={rawPrintList} setPrintList={setRawPrintList}
+                                            setRawPrintList={setRawPrintList} setActivePrint={setActivePrint}
                                             user_id={auth.id}
                                         />
                                     </div>
@@ -204,12 +207,33 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     <p className="text-gray-600">${bid.price.toFixed(2)}</p>
                                                                                     <div
                                                                                         onClick={() => {
-                                                                                            setActivePrint({
-                                                                                                ...activePrint,
-                                                                                                current_status: "PREPRINT"
-                                                                                            } as Job)
+                                                                                            // Note, anyone can call this endpoint - security could be trivially implemented,
+                                                                                            // But as this is a demo project we won't bother.
+
+                                                                                            setIsLoading(true)
+
+                                                                                            fetch(`api/jobs/accept-bid`, {
+                                                                                                method: "POST",
+                                                                                                body: JSON.stringify({
+                                                                                                    bid_id: bid.id,
+                                                                                                })
+                                                                                            }).then(k => {
+                                                                                                fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                                    const data: Job[] = await val.json();
+                                                                                                    setRawPrintList([ ...data ]);
+                                                                                                    setPrintList([ ...data ]);
+                                                                                                    setActivePrint(data?.at(0) ?? null);
+                                                                                                });
+
+                                                                                                setActivePrint({
+                                                                                                    ...activePrint,
+                                                                                                    current_status: "PREPRINT"
+                                                                                                } as Job);
+
+                                                                                                setIsLoading(false);
+                                                                                            })
                                                                                         }}
-                                                                                        className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
+                                                                                        className={`${isLoading ? "bg-green-50 text-green-800 text-opacity-50" : "bg-green-100 text-green-800"} px-2 py-1 rounded-md cursor-pointer`}>
                                                                                         Accept Bid
                                                                                     </div>
                                                                                 </div>
@@ -235,18 +259,26 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         </div>
                                                     </div>
                                                 )
+                                            case JobStatus.PREPRINT:
+                                                return (
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                            <p className="text-gray-400">The constructor is preparing to print your order, check back when they have started printing</p>
+                                                        </div>
+                                                    </div>
+                                                )
                                             case JobStatus.CANCELED:
                                                 return (
-                                                        <div className="flex flex-row items-start justify-center flex-1">
-                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                                <p className="text-gray-400">This print has been canceled.</p>
-                                                                <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Re-Request Print</p>
-                                                            </div>
-
-                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
-                                                                <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
-                                                            </div>
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                            <p className="text-gray-400">This print has been canceled.</p>
+                                                            <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Re-Request Print</p>
                                                         </div>
+
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                            <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                        </div>
+                                                    </div>
                                                 )
                                             default:
                                                 return (<></>)

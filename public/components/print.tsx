@@ -17,7 +17,7 @@ import {
 import { Job, Job as JobDBType } from "@prisma/client"
 import prisma from "@public/lib/prisma";
 
-export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList, user_id }:  { activeMenu: number, setActiveMenu: Function, setPrintList: Function, printList: Job[], user_id: string }) => {
+export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrintList, setActivePrint, printList, user_id }:  { activeMenu: number, setActiveMenu: Function, setRawPrintList: Function, setActivePrint: Function, setPrintList: Function, printList: Job[], user_id: string }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
     const [ is_dragged, setIsDragged ] = useState(false);
     const [ can_continue, setCanContinue ] = useState(false);
@@ -466,9 +466,16 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, printList,
                                 body: JSON.stringify(new_job)
                             }).then(b => {
                                 setCurrentJob(new_job);
-                                setPrintList([ ...printList, new_job ]);
+                                // setPrintList([ ...printList, new_job ]);
                                 setPrintMode(5);
                                 setWaiting(false);
+
+                                fetch(`/api/jobs/user/${user_id}`).then(async val => {
+                                    const data: Job[] = await val.json();
+                                    setRawPrintList(data);
+                                    setPrintList(data);
+                                    setActivePrint(data?.at(0) ?? null);
+                                });
                             });
                         }else {
                             setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : print_mode == 2 && can_continue ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)

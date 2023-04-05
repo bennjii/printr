@@ -1,6 +1,6 @@
 import {GetServerSideProps, type NextPage} from "next";
-import {createRef, useEffect, useState} from "react";
-import {DEFAULT_PRINTERS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
+import {ChangeEvent, createRef, useEffect, useState} from "react";
+import {DEFAULT_CONFIG, DEFAULT_PRINTERS, DEFAULT_PRINT_JOBS, DEFAULT_USER, getSize} from "../../public/lib/helpers";
 import {job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
@@ -8,6 +8,7 @@ import { Bid, BidMetadata, Job, Printer, User } from "@prisma/client";
 import { ModSession } from ".";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../server/auth";
+import Image from "next/image";
 
 const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => {
     const [ activePrint, setActivePrint ] = useState<Job | null>(null);
@@ -72,7 +73,29 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
     }, [rawPrintList]);
 
+    const [ config, setConfig ] = useState<PrintConfig>({ ...JSON.parse(JSON.stringify((DEFAULT_CONFIG))) });
+    const [ isDragged, setIsDragged ] = useState(false);
+    const [ canContinue, setCanContinue ] = useState(false);
+
     const printer_ref = createRef<HTMLSelectElement>();
+    const file_ref = createRef<HTMLInputElement>();
+    const message_ref = createRef<HTMLInputElement>();
+    const file_image_ref = createRef<HTMLInputElement>();
+
+    const onFileChangeCapture = ( e: ChangeEvent<HTMLInputElement> ) => {
+        e.preventDefault();
+        e.target.files ? dropHandler(e.target.files) : {};
+    };
+
+    const dropHandler = (files: FileList) => {
+        setIsDragged(false);
+
+        const f_l = config.files;
+        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "" });
+
+        setConfig({ ...config, files: f_l })
+        setCanContinue(true);
+    }
 
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
@@ -355,7 +378,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                 <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "1fr 120px 150px 1fr 100px" }}>
                                                                     <p className="font-bold">{k.name}</p>
                                                                     <p className="text-sm text-gray-600">{k.current_status}</p>
-                                                                    <p className="text-sm text-gray-400">{new Date(k.created_at).toLocaleString()}</p>
+                                                                    <p className="text-sm text-gray-400">{k.id}</p>
                                                                     <div></div>
                                                                     <p className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">{k.current_status == "PRINTING" ? "Idle Printer" : k.current_status == "IDLE" ? "Busy Printer" : "Idle Printer"}</p>
                                                                 </div>
@@ -416,7 +439,206 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                 </div>
                                             </div>
 
-                                            {/* <p>{activePrint?.status_history?.map(k => { return ( <></> ) })}</p> */}
+                                            <br />
+
+                                            {(() => {
+                                                switch(job_status_to_type(activePrint?.current_status ?? "")) {
+                                                    case JobStatus.PREPRINT:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-4 flex-1 h-full">
+                                                                    <p className="text-sm font-semibold">PRINT INFORMATION</p>
+
+                                                                    <div className="flex flex-col items-start">
+                                                                        <p className="text-gray-400 text-sm">CHOSEN PRINTER</p>
+                                                                        <p>{activePrint?.printer_id}</p>
+                                                                    </div>
+
+                                                                    <div className="flex flex-col items-start">
+                                                                        <p className="text-gray-400 text-sm">DOWNLOAD FILE</p>
+                                                                        <a className="text-blue-600" href={activePrint?.file_url}>Download</a>
+                                                                    </div>
+
+                                                                    <div className="flex flex-col items-start">
+                                                                        <p className="text-gray-400 text-sm">START PRINT</p>
+                                                                        <p 
+                                                                            onClick={() => {
+                                                                                fetch(`api/jobs/start-print`, {   
+                                                                                    method: "POST",
+                                                                                    body: JSON.stringify({
+                                                                                        job_id: activePrint?.id ?? ""
+                                                                                    })
+                                                                                }).then(async data => {
+                                                                                    const { job, printer }: { job: Job, printer: Printer } = await data.json();
+                                                                                    
+                                                                                    setActivePrint({
+                                                                                        ...job
+                                                                                    });
+
+                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                        const data: Job[] = await val.json();
+                                                                                        setRawPrintList(data);
+                                                                                        setPrintList(data);
+                                                                                        setActivePrint(data?.at(0) ?? null);
+                                                                                    });
+                                                                            
+                                                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                        const data: Printer[] = await val.json();
+                                                                                        setPrinters(data);
+                                                                                    });
+                                                                                })
+                                                                            }}
+                                                                            className={`${isLoading ? "bg-green-50 text-green-800 text-opacity-50" : "bg-green-100 text-green-800"} w-fit px-2 py-1 rounded-md cursor-pointer`}>Set print as started</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                    <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    case JobStatus.CANCELED:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                    <p className="text-gray-400">This print has been canceled.</p>
+                                                                    <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Re-Request Print</p>
+                                                                </div>
+
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                    <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    case JobStatus.PRINTING:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                    <p className="text-gray-400">Finished printing?</p>
+                                                                    <p 
+                                                                        onClick={() => {
+                                                                            if(isLoading) return;
+
+                                                                            setIsLoading(true);
+
+                                                                            fetch(`api/jobs/finish-print`, {   
+                                                                                method: "POST",
+                                                                                body: JSON.stringify({
+                                                                                    job_id: activePrint?.id ?? ""
+                                                                                })
+                                                                            }).then(async data => {
+                                                                                const { job, printer }: { job: Job, printer: Printer } = await data.json();
+                                                                                
+                                                                                setActivePrint({
+                                                                                    ...job
+                                                                                });
+
+                                                                                fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                    const data: Job[] = await val.json();
+                                                                                    setRawPrintList(data);
+                                                                                    setPrintList(data);
+                                                                                    setActivePrint(data?.at(0) ?? null);
+                                                                                });
+                                                                        
+                                                                                fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                    const data: Printer[] = await val.json();
+                                                                                    setPrinters(data);
+                                                                                });
+
+                                                                                setIsLoading(false);
+                                                                            })
+                                                                        }}
+                                                                        className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Mark as finished</p>
+                                                                </div>
+
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                                    <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    case JobStatus.PREDELIVERY:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-2 flex-1 h-full">
+                                                                    <div className="flex flex-row items-center justify-between gap-4">
+                                                                        <p>You must <strong>scan</strong> and <strong>take photos</strong> of the print to send to the customer.</p>
+                                                                        
+                                                                        <div className="flex flex-row items-center gap-2 bg-green-100 px-2 rounded-md">
+                                                                            <p className="text-green-600">Scan</p>
+
+                                                                            <svg width="18" height="11" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M17.7071 0.292893C18.0976 0.683417 18.0976 1.31658 17.7071 1.70711L6.70711 12.7071C6.31658 13.0976 5.68342 13.0976 5.29289 12.7071L0.292893 7.70711C-0.0976311 7.31658 -0.0976311 6.68342 0.292893 6.29289C0.683417 5.90237 1.31658 5.90237 1.70711 6.29289L6 10.5858L16.2929 0.292893C16.6834 -0.0976311 17.3166 -0.0976311 17.7071 0.292893Z" fill="#3DD35E"/>
+                                                                            </svg>
+                                                                        </div>
+
+                                                                        <div 
+                                                                            onClick={() => {
+                                                                                if(isLoading) return;
+
+                                                                                setIsLoading(true);
+                                                                                fetch(`api/jobs/submit-evidence`, {   
+                                                                                    method: "POST",
+                                                                                    body: JSON.stringify({
+                                                                                        job_id: activePrint?.id ?? ""
+                                                                                    })
+                                                                                }).then(async data => {
+                                                                                    const { job, printer }: { job: Job, printer: Printer } = await data.json();
+                                                                                    setActivePrint({
+                                                                                        ...job
+                                                                                    });
+    
+                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                        const data: Job[] = await val.json();
+                                                                                        setRawPrintList(data);
+                                                                                        setPrintList(data);
+                                                                                        setActivePrint(data?.at(0) ?? null);
+                                                                                    });
+                                                                            
+                                                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                        const data: Printer[] = await val.json();
+                                                                                        setPrinters(data);
+                                                                                    });
+
+                                                                                    setIsLoading(false);
+                                                                                })
+                                                                            }}
+                                                                            className="flex flex-row items-center gap-2 bg-gray-200 px-2 rounded-md cursor-pointer">
+                                                                            { isLoading ? <p className="text-gray-400">Submitting Evidence</p> : <p className="text-gray-800">Submit Evidence</p> }
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <input className="hidden" type="file" ref={file_ref} onChangeCapture={onFileChangeCapture} />
+                                                                    <input className="hidden" type="file" accept="image/*;capture=camera" ref={file_image_ref} onChangeCapture={onFileChangeCapture} />
+
+                                                                    <div
+                                                                        className={`border-2 flex px-32 py-32 items-center justify-center text-center ${isDragged ? "bg-blue-50 border-[#0066FF]" : "bg-gray-50 border-gray-200"}  border-dashed rounded-md w-full items-center justify-center`}
+                                                                        onDragEnter={() => setIsDragged(true)}
+                                                                        onDragLeave={() => setIsDragged(false)}
+                                                                        onDragOver={e => e.preventDefault()}
+                                                                        onDropCapture={(e) => {e.preventDefault(); dropHandler(e.dataTransfer.files)}}
+                                                                        // onDrop={(e) => {e.preventDefault(); dropHandler(e.dataTransfer.files)}}
+                                                                        >
+                                                                        <div className="font-semibold text-center select-none gap-1 flex flex-row items-center">Drag and drop, <a className="text-blue-600 cursor-pointer p-8 pr-0 ml-[-2rem]" onClick={() => file_ref.current?.click()}>choose</a> or <a className="text-blue-600 cursor-pointer p-8 pr-0 ml-[-2rem]" onClick={() => file_image_ref.current?.click()}>take</a> photo</div>
+                                                                    </div>
+
+                                                                    {
+                                                                        config.files.map((file, i) => {
+                                                                            return (
+                                                                                <div key={`INDX-${file.name}`} className="flex flex-row items-center gap-2">
+                                                                                    <div className="bg-blue-200 text-blue-800 px-2 rounded-md">{file?.name.split(".")[1]}</div>
+                                                                                    <p>{file?.size ? getSize(file?.size.toString(), 2) : "0B"}</p>
+                                                                                    <p className="text-gray-600">{file?.name.split(".")[0]}</p>
+                                                                                </div>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    default:
+                                                        return (<></>)
+                                                }
+                                            })()}
                                     </div>
                             }
                     </div>

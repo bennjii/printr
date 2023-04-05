@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const bid = await prisma.bid.create({ 
         data: {
-            bidder: user_id,
+            bidder_id: user_id,
             price: offer_value,
             job_id,
             printer_id: printer_id

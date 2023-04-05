@@ -133,7 +133,7 @@ export type Job = {
 
 export type Bid = {
     id: string,
-    bidder: string
+    bidder_id: string
 
     created_at: string,
     updated_at: string,

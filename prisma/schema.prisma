@@ -39,9 +39,11 @@ model User {
   is_constructor Boolean
   location       String
   Constructor    Constructor?
+
   JobMetadata    JobMetadata[]
   Job            Job[]
   BidMetadata    BidMetadata[]
+  Bids           Bid[]
 }
 
 model Constructor {
@@ -134,7 +136,9 @@ model JobMetadata {
 
 model Bid {
   id String @id @default(cuid())
-  bidder String
+
+  bidder    User   @relation(fields: [bidder_id], references: [id], onDelete: Cascade)
+  bidder_id String
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())

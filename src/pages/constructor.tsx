@@ -107,7 +107,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                             <div className="w-full flex flex-col flex-1">
                                 <p className="text-gray-600 uppercase text-sm">Allocate Printer</p>
-                                <select className="px-4 py-2 rounded-md bg-gray-100" ref={printer_ref}>
+                                <select className="px-4 py-2 rounded-md bg-gray-100" ref={printer_ref} defaultValue={printers.filter(k => k.id == offerModal.printer)[0]?.id}>
                                     {
                                         printers.filter(k => k.current_status == "IDLE" || k.id == offerModal.printer).map(k => {
                                             console.log(printers, offerModal.printer);
@@ -293,11 +293,11 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                     <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
                                                                     {
                                                                         //@ts-ignore
-                                                                        k.Bids?.filter((k: Bid) => k.bidder == auth.id).length > 0 ?
+                                                                        k.Bids?.filter((k: Bid) => k.bidder_id == auth.id).length > 0 ?
                                                                         <p
                                                                         onClick={() => {
                                                                             //@ts-ignore
-                                                                            fetch(`/api/offer/${k.Bids?.filter((k: Bid) => k.bidder == auth.id)[0].id}`).then(async b => {
+                                                                            fetch(`/api/offer/${k.Bids?.filter((k: Bid) => k.bidder_id == auth.id)[0].id}`).then(async b => {
                                                                                 const bid: Bid = await b.json();
                                                                                 console.log("OPEN BID", bid);
 

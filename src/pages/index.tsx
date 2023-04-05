@@ -1,7 +1,7 @@
 import {GetServerSideProps, type NextPage} from "next";
 import {useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
-import {DEFAULT_BIDS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
+import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
 import {History, job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
@@ -10,7 +10,7 @@ import {getSession, useSession} from "next-auth/react";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../server/auth";
-import { Job, User } from "@prisma/client";
+import { Bid, Job, User } from "@prisma/client";
 
 export type ModSession = {
     user: {
@@ -190,30 +190,38 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                             <p className="text-gray-600">Bids</p>
 
                                                             {
-                                                                DEFAULT_BIDS.map((bid, i, a) => {
-                                                                    return (
-                                                                            <>
-                                                                            <div key={bid.id} className="flex flex-row items-center gap-2 flex-1 justify-between w-full" style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px" }}>
-                                                                                <p className="font-semibold">{bid.bidder}</p>
-                                                                                <p className="text-gray-600">${bid.price.toFixed(2)}</p>
-                                                                                <div
-                                                                                    onClick={() => {
-                                                                                        setActivePrint({
-                                                                                            ...activePrint,
-                                                                                            current_status: "PREPRINT"
-                                                                                        } as Job)
-                                                                                    }}
-                                                                                    className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
-                                                                                    Accept Bid
+                                                                //@ts-ignore
+                                                                activePrint.Bids.length > 0 ?
+                                                                    //@ts-ignore
+                                                                    activePrint.Bids.map((bid: Bid, i, a) => {
+                                                                        return (
+                                                                                <>
+                                                                                <div key={bid.id} className="flex flex-row items-center gap-2 flex-1 justify-between w-full" style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px" }}>
+                                                                                    <p className="font-semibold">{
+                                                                                        //@ts-ignore
+                                                                                        bid.bidder.name
+                                                                                        }</p>
+                                                                                    <p className="text-gray-600">${bid.price.toFixed(2)}</p>
+                                                                                    <div
+                                                                                        onClick={() => {
+                                                                                            setActivePrint({
+                                                                                                ...activePrint,
+                                                                                                current_status: "PREPRINT"
+                                                                                            } as Job)
+                                                                                        }}
+                                                                                        className="bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer">
+                                                                                        Accept Bid
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
 
-                                                                            {
-                                                                                i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
-                                                                            }
-                                                                        </>
-                                                                    )
-                                                                })
+                                                                                {
+                                                                                    i == a.length-1 ? <></> : <div className="h-[2px] w-full bg-gray-200 border-solid rounded-full"></div>
+                                                                                }
+                                                                            </>
+                                                                        )
+                                                                    })
+                                                                :
+                                                                    <p className="text-gray-400 w-full text-center pt-4">No current bids, check back later.</p>
                                                             }
                                                         </div>
 

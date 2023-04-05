@@ -379,32 +379,32 @@ export const DEFAULT_USER: User = {
     location: "Sydney, NSW",
 }
 
-export const DEFAULT_BIDS: Bid[] = [
-    {
-        id: "anaovna00sgenoin3",
-        bidder: "Darlington Prints",
+// export const DEFAULT_BIDS: Bid[] = [
+//     {
+//         id: "anaovna00sgenoin3",
+//         bidder: "Darlington Prints",
 
-        created_at: "2023-03-27",
-        updated_at: "2023-03-27",
+//         created_at: "2023-03-27",
+//         updated_at: "2023-03-27",
 
-        price: 15.20
-    },
-    {
-        id: "anaovna00sgenoin3",
-        bidder: "Central 3D Printers",
+//         price: 15.20
+//     },
+//     {
+//         id: "anaovna00sgenoin3",
+//         bidder: "Central 3D Printers",
 
-        created_at: "2023-03-27",
-        updated_at: "2023-03-27",
+//         created_at: "2023-03-27",
+//         updated_at: "2023-03-27",
 
-        price: 18.42
-    },
-    {
-        id: "anaovna00sgenoin3",
-        bidder: "Jackson House Prints",
+//         price: 18.42
+//     },
+//     {
+//         id: "anaovna00sgenoin3",
+//         bidder: "Jackson House Prints",
 
-        created_at: "2023-03-27",
-        updated_at: "2023-03-27",
+//         created_at: "2023-03-27",
+//         updated_at: "2023-03-27",
 
-        price: 12.86
-    }
-]
+//         price: 12.86
+//     }
+// ]

@@ -10,20 +10,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const t = new Date().getTime();
 
     if(String(userId)) {
-        const result = await prisma.job.findMany({
+        const result = await prisma.constructor.findUnique({
             where: {
-                submitter_id: String(userId)
+                owner_id: String(userId)
             },
-            include: {
-                constructor: true,
-                submitter: true,
-                Bids: true
+        });
+
+        const printers = await prisma.printer.findMany({
+            where: {
+                constructor_id: result?.id
             }
         });
 
         console.log("Finished Request in ", new Date().getTime() - t, "ms ");
 
-        res.json(result);
+        res.json(printers);
     }else {
         res.json({});
     }

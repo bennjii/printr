@@ -4,20 +4,18 @@ import prisma from '@lib/prisma'
 // GET /api/user/[id]
 // Required fields in body: name, email
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-    const userId = req.query.id?.toString();
+    const bidId = req.query.id?.toString();
 
     console.log("Found Request");
     const t = new Date().getTime();
 
-    if(String(userId)) {
-        const result = await prisma.job.findMany({
+    if(String(bidId)) {
+        const result = await prisma.bid.findUnique({
             where: {
-                submitter_id: String(userId)
+                id: String(bidId)
             },
             include: {
-                constructor: true,
-                submitter: true,
-                Bids: true
+                printer: true
             }
         });
 

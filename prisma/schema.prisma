@@ -55,6 +55,7 @@ model Constructor {
   owner    User   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
 
   location        String
+  Printers        Printer[]
   PrinterMetadata PrinterMetadata[]
   Job             Job[]
   JobMetadata     JobMetadata[]
@@ -72,6 +73,11 @@ model Printer {
   PrinterMetadata PrinterMetadata?
   JobMetadata     JobMetadata[]
   Job             Job[]
+
+  Bids          Bid[]
+
+  constructor    Constructor @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
+  constructor_id String
 }
 
 model PrinterMetadata {
@@ -109,6 +115,7 @@ model Job {
 
   JobMetadata    JobMetadata?
   BidMetadata    BidMetadata[]
+  Bids           Bid[]
 }
 
 model JobMetadata {
@@ -132,7 +139,13 @@ model Bid {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  price       Int
+  job    Job    @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  job_id String
+
+  printer    Printer    @relation(fields: [printer_id], references: [id], onDelete: Cascade)
+  printer_id String 
+
+  price       Float
   BidMetadata BidMetadata?
 }
 

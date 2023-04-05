@@ -163,7 +163,8 @@ export const DEFAULT_PRINTERS: Printer[] = [
         created_at: new Date(),
         updated_at: new Date(),
 
-        current_status: PrinterStatus.IDLE
+        current_status: PrinterStatus.IDLE,
+        constructor_id: "01"
     },
     {
         id: "FF2",
@@ -173,7 +174,8 @@ export const DEFAULT_PRINTERS: Printer[] = [
         created_at: new Date(),
         updated_at: new Date(),
 
-        current_status: PrinterStatus.IDLE
+        current_status: PrinterStatus.IDLE,
+        constructor_id: "01"
     },
     {
         id: "UltiMakS3-1",
@@ -183,7 +185,8 @@ export const DEFAULT_PRINTERS: Printer[] = [
         created_at: new Date(),
         updated_at: new Date(),
 
-        current_status: PrinterStatus.IDLE
+        current_status: PrinterStatus.IDLE,
+        constructor_id: "01"
     },
     {
         id: "UltiMakS3-1",
@@ -193,7 +196,8 @@ export const DEFAULT_PRINTERS: Printer[] = [
         created_at: new Date(),
         updated_at: new Date(),
 
-        current_status: PrinterStatus.IDLE
+        current_status: PrinterStatus.IDLE,
+        constructor_id: "01"
     }
 ];
 

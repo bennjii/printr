@@ -4,7 +4,7 @@ import {DEFAULT_PRINTERS, DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/l
 import {job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
-import { Job, Printer, User } from "@prisma/client";
+import { Bid, BidMetadata, Job, Printer, User } from "@prisma/client";
 import { ModSession } from ".";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../server/auth";
@@ -14,17 +14,23 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
     const [ activeUser, setActiveUser ] = useState(auth.user as any as User);
 
     const [ printList, setPrintList ] = useState<Job[]>([]);
-    const [ printers, setPrinters ] = useState<Printer[]>(DEFAULT_PRINTERS);
+    const [ printers, setPrinters ] = useState<Printer[]>([]);
     const [ rawPrintList, setRawPrintList ] = useState<Job[]>([]);
 
     const [ offerModal, setOfferModal ] = useState<{
         active: boolean,
         job_id: string | null,
-        value: number
+        value: number,
+        type: "create" | "delete",
+        bid_id: string,
+        printer: string,
     }>({
         active: false,
         job_id: null,
-        value: 0.0
+        value: 0.0,
+        type: "create",
+        bid_id: "",
+        printer: "",
     });
 
     useEffect(() => {
@@ -38,6 +44,11 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
             setRawPrintList(data);
             setPrintList(data);
             setActivePrint(data?.at(0) ?? null);
+        });
+
+        fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+            const data: Printer[] = await val.json();
+            setPrinters(data);
         });
     }, [])
 
@@ -61,6 +72,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
     }, [rawPrintList]);
 
+    const printer_ref = createRef<HTMLSelectElement>();
+
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
                 <Header activeUser={activeUser} currentPage="CONST" />
@@ -79,26 +92,28 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                 e.stopPropagation()
                             }}
                             id="modal"
-                            className="bg-white flex flex-col items-center gap-4 p-8 rounded-md min-w-[400px]">
-                            <div className="flex flex-col flex-start justify-start items-start pr-32 w-full">
-                                <p className="font-bold text-xl">Make Offer</p>
+                            className="bg-white flex flex-col items-center gap-4 p-8 rounded-md min-w-[440px]">
+                            <div className="flex flex-col flex-start justify-start items-start w-full">
+                                <p className="font-bold text-xl">{offerModal.type == "create" ? "Make" : "Modify"} Offer</p>
                                 <p className="text-gray-500">{activePrint?.file_name}</p>
                             </div>
 
                             <div className="w-full flex flex-col flex-1">
                                 <p className="text-gray-600 uppercase text-sm">Offer Value</p>
-                                <input ref={offer_ref} placeholder="$15.00" className="px-4 py-2 rounded-md bg-gray-100" onChange={(e) => {
+                                <input defaultValue={offerModal.value != 0 ? offerModal.value : undefined} ref={offer_ref} placeholder="$15.00" className="px-4 py-2 rounded-md bg-gray-100" onChange={(e) => {
                                     setOfferModal({ ...offerModal, value: parseFloat(e.target.value) });
                                 }}></input>
                             </div>
 
                             <div className="w-full flex flex-col flex-1">
                                 <p className="text-gray-600 uppercase text-sm">Allocate Printer</p>
-                                <select className="px-4 py-2 rounded-md bg-gray-100">
+                                <select className="px-4 py-2 rounded-md bg-gray-100" ref={printer_ref}>
                                     {
-                                        printers.map(k => {
+                                        printers.filter(k => k.current_status == "IDLE" || k.id == offerModal.printer).map(k => {
+                                            console.log(printers, offerModal.printer);
+
                                             return (
-                                                <option className="px-4 py-2 rounded-md">{k.current_status} - {k.name}</option>
+                                                <option className="px-4 py-2 rounded-md" value={k.id}>{k.current_status == "UNAVALIABLE" ? "Current" : "Available"} - {k.name}</option>
                                             )
                                         })
                                     }
@@ -107,30 +122,110 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                             <br />
 
-                            <div
-                                onClick={() => {
-                                    if(!isLoading) {
-                                        setIsLoading(true)
-                                        fetch(`/api/offer/create`, {
-                                            method: "POST",
-                                            body: JSON.stringify({
-                                                user_id: auth.id,
-                                                job_id: offerModal.job_id,
-                                                offer_value: offerModal.value
-                                            })
-                                        }).then(async val => {
-                                            const data = await val.json();
-                                            console.log("Bid", data);
+                            <div className="flex flex-row items-center gap-2 w-full flex-1">
+                                <div
+                                    onClick={() => {
+                                        if(!isLoading) {
+                                            setIsLoading(true)
 
-                                            setOfferModal({ ...offerModal, active: false })
-                                        });
-                                    }
-                                }}
-                                className={`text-sm text-center cursor-pointer font-semibold ${ isLoading ? "bg-green-50 text-green-800 text-opacity-50" : "bg-green-100 text-green-800" } items-center justify-center p-2 rounded-md w-full flex-1 flex`}>
+                                            if(offerModal.type != "delete") {
+                                                fetch(`/api/offer/create`, {
+                                                    method: "POST",
+                                                    body: JSON.stringify({
+                                                        user_id: auth.id,
+                                                        job_id: offerModal.job_id,
+                                                        printer_id: printer_ref.current?.value,
+                                                        offer_value: offerModal.value
+                                                    })
+                                                }).then(async val => {
+                                                    const data = await val.json();
+                                                    console.log("Bid", data);
+    
+                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                        const data: Job[] = await val.json();
+                                                        setRawPrintList(data);
+                                                        setPrintList(data);
+                                                        setActivePrint(data?.at(0) ?? null);
+                                                    });
+                                            
+                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                        const data: Printer[] = await val.json();
+                                                        setPrinters(data);
+                                                    });
+    
+                                                    setIsLoading(false)
+                                                    setOfferModal({ ...offerModal, active: false })
+                                                });
+                                            }else {
+                                                fetch(`/api/offer/update`, {
+                                                    method: "POST",
+                                                    body: JSON.stringify({
+                                                        bid_id: offerModal.bid_id,
+                                                        user_id: auth.id,
+                                                        job_id: offerModal.job_id,
+                                                        printer_id: printer_ref.current?.value,
+                                                        offer_value: offerModal.value
+                                                    })
+                                                }).then(async val => {
+                                                    const data = await val.json();
+                                                    console.log("Bid", data);
+    
+                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                        const data: Job[] = await val.json();
+                                                        setRawPrintList(data);
+                                                        setPrintList(data);
+                                                        setActivePrint(data?.at(0) ?? null);
+                                                    });
+                                            
+                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                        const data: Printer[] = await val.json();
+                                                        setPrinters(data);
+                                                    });
+    
+                                                    setIsLoading(false)
+                                                    setOfferModal({ ...offerModal, active: false })
+                                                });
+                                            }
+                                        }
+                                    }}
+                                    className={`text-sm text-center cursor-pointer font-semibold ${ isLoading ? "bg-green-50 text-green-800 text-opacity-50" : "bg-green-100 text-green-800" } items-center justify-center p-2 rounded-md w-full flex-1 flex`}>
+                                        {
+                                            isLoading ? "Placing Offer..." : offerModal.type == "delete" ? "Save Offer" : "Confirm Offer"
+                                        }
+                                    </div>
+
                                     {
-                                        isLoading ? "Placing Offer..." : "Confirm Offer"
-                                    }
-                                </div>
+                                    offerModal.type == "delete" ? 
+                                    <div
+                                        onClick={() => {
+                                            if(!isLoading) {
+                                                setIsLoading(true)
+                                                fetch(`/api/offer/delete`, {
+                                                    method: "POST",
+                                                    body: JSON.stringify({
+                                                        user_id: auth.id,
+                                                        job_id: offerModal.job_id,
+                                                        printer_id: printer_ref.current?.value,
+                                                        offer_value: offerModal.value,
+                                                        bid_id: offerModal.bid_id
+                                                    })
+                                                }).then(async val => {
+                                                    const data = await val.json();
+                                                    console.log("Bid", data);
+
+                                                    setOfferModal({ ...offerModal, active: false })
+                                                });
+                                            }
+                                        }}
+                                        className={`text-sm text-center cursor-pointer font-semibold ${ isLoading ? "bg-red-50 text-red-800 text-opacity-50" : "bg-red-100 text-red-800" } items-center justify-center p-2 rounded-md w-full flex-1 flex`}>
+                                            {
+                                                isLoading ? "Revoking Offer..." : "Revoke Offer"
+                                            }
+                                        </div>
+                                    :
+                                    <></>
+                                }
+                            </div>
                         </div>
                     </div>
                     :
@@ -143,14 +238,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                         {/* All of the prints in queue */}
                         {
+                            printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).length > 0 ?
                             printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            :
+                            <p className="w-full text-center text-gray-400 text-sm pt-4">No current active jobs</p>
                         }
 
                         <br />
 
                         <p className="text-gray-600">Inactive Jobs</p>
                         {
+                            printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).length > 0 ? 
                             printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            :
+                            <p className="w-full text-center text-gray-400 text-sm pt-4">No current inactive jobs</p>
                         }
                     </div>
                     <div className={`flex flex-col flex-1 py-[32px] pb-0`}>
@@ -181,19 +282,47 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                     printList.filter(k => job_status_to_type(k.current_status) == 0).map((k, i, a) => {
                                                         return (
                                                             <>
-                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 100px 90px 75px 50px 1fr 15px 1fr" }}>
+                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "200px 175px 90px 75px 50px 1fr" }}>
                                                                     <p className="font-bold">{k.job_name}</p>
-                                                                    <p className="text-sm text-gray-400">{k.created_at.toString()}</p>
+                                                                    <p className="text-sm text-gray-400">{new Date(k.created_at).toLocaleString()}</p>
                                                                     <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).colour.name}</p>
                                                                     <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).delivery.method}</p>
                                                                     <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).filament.name}</p>
+
+                                                                    <div className="flex flex-col gap-2">
                                                                     <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
-                                                                    <div></div>
-                                                                    <p
+                                                                    {
+                                                                        //@ts-ignore
+                                                                        k.Bids?.filter((k: Bid) => k.bidder == auth.id).length > 0 ?
+                                                                        <p
                                                                         onClick={() => {
-                                                                            setOfferModal({ ...offerModal, active: true, job_id: k.id })
+                                                                            //@ts-ignore
+                                                                            fetch(`/api/offer/${k.Bids?.filter((k: Bid) => k.bidder == auth.id)[0].id}`).then(async b => {
+                                                                                const bid: Bid = await b.json();
+                                                                                console.log("OPEN BID", bid);
+
+                                                                                setOfferModal({ 
+                                                                                    ...offerModal, 
+                                                                                    active: true, 
+                                                                                    type: "delete", 
+                                                                                    job_id: k.id,
+                                                                                    value: bid.price,
+                                                                                    bid_id: bid.id,
+                                                                                    //@ts-ignore
+                                                                                    printer: bid.printer_id
+                                                                                })
+                                                                            });
+                                                                            
+                                                                        }}
+                                                                        className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">Modify Offer</p>
+                                                                        :
+                                                                        <p
+                                                                        onClick={() => {
+                                                                            setOfferModal({ ...offerModal, active: true, type: "create", job_id: k.id, value: 0 })
                                                                         }}
                                                                         className="text-sm text-center cursor-pointer font-semibold bg-green-100 text-green-800 rounded-md">Make Offer</p>
+                                                                    }
+                                                                    </div>
                                                                 </div>
 
                                                                 {
@@ -220,12 +349,12 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                     printers.map((k, i, a) => {
                                                         return (
                                                             <>
-                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "1fr 50px 150px 1fr 100px" }}>
+                                                                <div className={`flex flex-row items-center `} style={{ display: "grid", gridTemplateColumns: "1fr 120px 150px 1fr 100px" }}>
                                                                     <p className="font-bold">{k.name}</p>
                                                                     <p className="text-sm text-gray-600">{k.current_status}</p>
-                                                                    <p className="text-sm text-gray-400">{k.created_at.toDateString()}</p>
+                                                                    <p className="text-sm text-gray-400">{new Date(k.created_at).toLocaleString()}</p>
                                                                     <div></div>
-                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">Idle Printer</p>
+                                                                    <p className="text-sm text-center cursor-pointer font-semibold bg-orange-100 text-orange-800 rounded-md">{k.current_status == "PRINTING" ? "Idle Printer" : k.current_status == "IDLE" ? "Busy Printer" : "Idle Printer"}</p>
                                                                 </div>
 
                                                                 {

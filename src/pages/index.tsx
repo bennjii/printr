@@ -74,14 +74,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                         <p className="text-gray-600">Current Prints</p>
                         {/* All of the prints in queue */}
                         {
+                            printList.filter(k => job_status_to_type(k.current_status) < 5).length > 0 ?
                             printList.filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            :
+                            <p className="w-full text-center text-gray-400 text-sm pt-4">No current prints</p>
                         }
 
                         <br />
 
                         <p className="text-gray-600">Old Prints</p>
                         {
+                            printList.filter(k => job_status_to_type(k.current_status) >= 5).length > 0 ?
                             printList.filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            :
+                            <p className="w-full text-center text-gray-400 text-sm pt-4">No old/archived prints</p>
                         }
                     </div>
 

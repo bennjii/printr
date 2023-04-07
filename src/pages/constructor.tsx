@@ -63,15 +63,15 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         setIsNewInJobQueue(false)
     }, [activeMenu]);
 
-    useEffect(() => {
-        const diff = rawPrintList.filter(element => !printList.includes(element));
+    // useEffect(() => {
+    //     const diff = rawPrintList.filter(element => !printList.includes(element));
 
-        if(diff.length > 0) {
-            setActivePrint(diff[0] ?? null)
-        }
+    //     if(diff.length > 0) {
+    //         setActivePrint(diff[0] ?? null)
+    //     }
 
-        setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
-    }, [rawPrintList]);
+    //     setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
+    // }, [rawPrintList]);
 
     const [ config, setConfig ] = useState<PrintConfig>({ ...JSON.parse(JSON.stringify((DEFAULT_CONFIG))) });
     const [ isDragged, setIsDragged ] = useState(false);
@@ -285,8 +285,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                 isNewInJobQueue ? <div className="h-3 w-3 rounded-full bg-orange-400"></div> : <></>
                                 }
                             </div>
-                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>Printer List</div>
-                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 2 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((2))}>Active Print - {activePrint?.job_name}</div>
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 2 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((2))}>Printer List</div>
+                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>Active Print - {activePrint?.job_name}</div>
                         </div>
 
                         <div className={`flex flex-col flex-1 bg-gray-100 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
@@ -361,7 +361,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                             </div>
                                         </div>
                                 :
-                            activeMenu == 1 ?
+                                activeMenu == 2 ?
                                         <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
                                             <div className="flex justify-start flex-col gap-4 place-start" >
                                                 <div className="flex flex-col">
@@ -477,8 +477,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
                                                                                     fetch(`/api/jobs/user/${auth.id}`).then(async val => {
                                                                                         const data: Job[] = await val.json();
-                                                                                        setRawPrintList(data);
-                                                                                        setPrintList(data);
+                                                                                        setRawPrintList([...data]);
+                                                                                        setPrintList([...data]);
                                                                                         setActivePrint(data?.at(0) ?? null);
                                                                                     });
                                                                             

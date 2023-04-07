@@ -199,19 +199,88 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                             <div className="flex flex-row items-center gap-4 w-full justify-end">
                                                                 <p 
                                                                     onClick={() => {
+                                                                        if(isLoading) return;
+                                                                        setIsLoading(true)
+
                                                                         // Update job to en-route
+                                                                        fetch(`/api/jobs/complete-job`, {
+                                                                            method: "POST",
+                                                                            body: JSON.stringify({ 
+                                                                                job_id: activePrint?.id,
+                                                                                notes: message_ref.current?.value
+                                                                            })
+                                                                        }).then(b => {
+                                                                            fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                const data: Job[] = await val.json();
+                                                                                setRawPrintList([ ...data ]);
+                                                                                setPrintList([ ...data ]);
+                                                                                setActivePrint(data?.at(0) ?? null);
+
+                                                                                setActivePrint({
+                                                                                    ...activePrint,
+                                                                                    current_status: "ENROUTE"
+                                                                                } as Job);
+
+                                                                                setIsLoading(false);
+                                                                            });
+                                                                        })
                                                                     }}
-                                                                    className="bg-green-100 text-green-800 text-center px-4 rounded-md cursor-pointer">Accept</p>
+                                                                    className={`${isLoading ? "opacity-40" : "cursor-pointer"} bg-green-100 text-green-800 text-center px-4 rounded-md`}>Accept</p>
                                                                 <p 
                                                                     onClick={() => {
+                                                                        if(isLoading) return;
+                                                                        setIsLoading(true)
+
                                                                         // Update job to pre-delivery
+                                                                        fetch(`/api/jobs/finish-print`, {
+                                                                            method: "POST",
+                                                                            body: JSON.stringify({ 
+                                                                                job_id: activePrint?.id,
+                                                                                notes: message_ref.current?.value
+                                                                            })
+                                                                        }).then(b => {
+                                                                            fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                const data: Job[] = await val.json();
+                                                                                setRawPrintList([ ...data ]);
+                                                                                setPrintList([ ...data ]);
+                                                                                setActivePrint(data?.at(0) ?? null);
+
+                                                                                setActivePrint({
+                                                                                    ...activePrint,
+                                                                                    current_status: "PREDELIVERY"
+                                                                                } as Job);
+
+                                                                                setIsLoading(false);
+                                                                            });
+                                                                        })
                                                                     }}
-                                                                    className="bg-blue-100 text-blue-800 text-center px-4 rounded-md cursor-pointer">Request More Evidence</p>
+                                                                    className={`${isLoading ? "opacity-40" : "cursor-pointer"} bg-blue-100 text-blue-800 text-center px-4 rounded-md`}>Request More Evidence</p>
                                                                 <p 
                                                                     onClick={() => {
-                                                                        // Update job to en-route
+                                                                        if(isLoading) return;
+                                                                        setIsLoading(true)
+
+                                                                        // Update job to pre-print
+                                                                        fetch(`/api/jobs/accept-bid`, {
+                                                                            method: "POST",
+                                                                            body: JSON.stringify({ bid_id: null })
+                                                                        }).then(b => {
+                                                                            fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                const data: Job[] = await val.json();
+                                                                                setRawPrintList([ ...data ]);
+                                                                                setPrintList([ ...data ]);
+                                                                                setActivePrint(data?.at(0) ?? null);
+
+                                                                                setActivePrint({
+                                                                                    ...activePrint,
+                                                                                    current_status: "PREPRINT"
+                                                                                } as Job);
+
+                                                                                setIsLoading(false);
+                                                                            });
+                                                                        })
                                                                     }}
-                                                                    className="bg-red-100 text-red-800 text-center px-4 rounded-md cursor-pointer">Re-Print</p>
+                                                                    className={`${isLoading ? "opacity-40" : "cursor-pointer"} bg-red-100 text-red-800 text-center px-4 rounded-md cursor-pointer`}>Re-Print</p>
                                                             </div>
                                                             <br />
                                                             <p className="text-gray-400">When requesting a re-print, you understand you incur the wait and must communicate responsibly in order to fulfil your order correctly.</p>

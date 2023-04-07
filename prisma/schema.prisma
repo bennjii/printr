@@ -107,6 +107,8 @@ model Job {
   job_name      String
   file_name     String
 
+  notes         String @default("")
+
   constructor    Constructor? @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
   constructor_id String?
 

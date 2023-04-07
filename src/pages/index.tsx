@@ -1,5 +1,5 @@
 import {GetServerSideProps, type NextPage} from "next";
-import {useEffect, useState} from "react";
+import {createRef, useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
 import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
 import {History, job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
@@ -41,6 +41,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 
     const [ activeMenu, setActiveMenu ] = useState<number>(0);
     const [ isLoading, setIsLoading ] = useState(false);
+
+    const message_ref = createRef<HTMLInputElement>();
 
     useEffect(() => {
         fetch(`/api/user/${auth.id}`).then(async val => {
@@ -175,17 +177,55 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                         switch(job_status_to_type(activePrint?.current_status ?? "")) {
                                             case JobStatus.DRAFT:
                                                 return (
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                            <p className="text-gray-400">This is currently a draft</p>
+                                                            <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Request Print</p>
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
+                                                            <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            case JobStatus.REVIEW:
+                                                return (
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                            <div className="flex flex-1 items-center justify-center">EVIDENCE</div>
+                                                            <input ref={message_ref} placeholder="Notes regarding your decision" className="px-4 py-2 rounded-md w-full" onChange={(e) => {
+                                                                    // setConfig({ ...config, message: e.target.value });
+                                                                }}></input>
+                                                            <div className="flex flex-row items-center gap-4 w-full justify-end">
+                                                                <p 
+                                                                    onClick={() => {
+                                                                        // Update job to en-route
+                                                                    }}
+                                                                    className="bg-green-100 text-green-800 text-center px-4 rounded-md cursor-pointer">Accept</p>
+                                                                <p 
+                                                                    onClick={() => {
+                                                                        // Update job to pre-delivery
+                                                                    }}
+                                                                    className="bg-blue-100 text-blue-800 text-center px-4 rounded-md cursor-pointer">Request More Evidence</p>
+                                                                <p 
+                                                                    onClick={() => {
+                                                                        // Update job to en-route
+                                                                    }}
+                                                                    className="bg-red-100 text-red-800 text-center px-4 rounded-md cursor-pointer">Re-Print</p>
+                                                            </div>
+                                                            <br />
+                                                            <p className="text-gray-400">When requesting a re-print, you understand you incur the wait and must communicate responsibly in order to fulfil your order correctly.</p>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            case JobStatus.PREDELIVERY:
+                                                    return (
                                                         <div className="flex flex-row items-start justify-center flex-1">
                                                             <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                                <p className="text-gray-400">This is currently a draft</p>
-                                                                <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Request Print</p>
-                                                            </div>
-
-                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 rounded-md overflow-hidden bg-gray-200 h-full">
-                                                                <Image width="800" height="250" src="https://cdn.thingiverse.com/assets/77/43/33/73/12/featured_preview_d5f32543-af68-4dd7-ba21-261384749770.png" alt="Print" />
+                                                                <p className="text-gray-400">Soon, your constructor will upload evidence of your print, you may review them</p>
                                                             </div>
                                                         </div>
-                                                        )
+                                                    )
                                             case JobStatus.BIDDING:
                                                 return (
                                                     <div className="flex flex-row items-start justify-center flex-1 gap-4">

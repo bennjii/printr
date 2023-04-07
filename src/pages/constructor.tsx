@@ -497,6 +497,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                 </div>
                                                             </div>
                                                         )
+                                                    case JobStatus.REVIEW:
+                                                            return (
+                                                                <div className="flex flex-row items-start justify-center flex-1">
+                                                                    <div className="flex flex-col gap-4 flex-1 h-full">
+                                                                        <p className="text-gray-400 text-center">The customer is reviewing the evidence of the print,<br /> upon their acceptance you may package and deliver the print.</p>
+                                                                    </div>
+                                                                </div>
+                                                            )
                                                     case JobStatus.CANCELED:
                                                         return (
                                                             <div className="flex flex-row items-start justify-center flex-1">

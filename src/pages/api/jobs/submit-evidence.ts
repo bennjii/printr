@@ -15,7 +15,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
     });
 
-    if(JSON.parse(pref?.job_preferences?.toString() ?? "{}").DANGEROUS_PREFERS_NO_CHECKS) {
+    console.log(pref?.job_preferences);
+
+    //@ts-ignore
+    if(pref?.job_preferences?.DANGEROUS_PREFERS_NO_CHECKS!) {
         const job = await prisma.job.update({
             where: {
                 id: job_id
@@ -35,8 +38,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 current_status: "REVIEW"
             }
         });
-    }
 
+        res.status(200).json({ job })
+    }
 }
 
 export default handler;

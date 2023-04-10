@@ -1,6 +1,6 @@
 export enum JobStatus {
     BIDDING, PREPRINT,
-    PRINTING, PREDELIVERY, REVIEW, ENROUTE,
+    PRINTING, PREDELIVERY, REVIEW, ENROUTE, READYFORPICKUP,
 
     COMPLETE, CANCELED, DRAFT
 }
@@ -25,6 +25,8 @@ export const job_status_to_string = (status: JobStatus) => {
             return "Pre-Print"
         case JobStatus.PRINTING:
             return "Printing"
+        case JobStatus.READYFORPICKUP:
+            return "Ready for Pickup"
     }
 }
 
@@ -48,6 +50,8 @@ export const job_status_to_type = (status: string) => {
             return JobStatus.PREPRINT
         case "PRINTING":
             return JobStatus.PRINTING
+        case "READYFORPICKUP":
+            return JobStatus.READYFORPICKUP
     }
 
     return JobStatus.BIDDING

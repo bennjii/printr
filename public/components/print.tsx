@@ -458,7 +458,8 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 job_preferences: config,
                                 submitter_id: user_id,
                                 constructor_id: null,
-                                printer_id: null
+                                printer_id: null,
+                                notes: ""
                             };
 
                             fetch(`/api/jobs/create`, {

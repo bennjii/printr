@@ -376,6 +376,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         </div>
                                                     </div>
                                                 )
+                                            case JobStatus.ENROUTE:
+                                                return (
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                            <p className="text-gray-400">The constructor is sending your order, you will be sent tracking information shortly.</p>
+                                                        </div>
+                                                    </div>
+                                                )
                                             case JobStatus.CANCELED:
                                                 return (
                                                     <div className="flex flex-row items-start justify-center flex-1">

@@ -24,7 +24,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 id: job_id
             },
             data: {
-                current_status: "ENROUTE"
+                //@ts-ignore
+                current_status: pref?.job_preferences?.delivery?.method == "Pickup" ? "READYFORPICKUP" : "ENROUTE"
             }
         });
 

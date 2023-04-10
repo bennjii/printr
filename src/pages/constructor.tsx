@@ -518,6 +518,48 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                 </div>
                                                             </div>
                                                         )
+                                                    case JobStatus.ENROUTE:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                    <p className="text-gray-600">Marked as En-Route, please create a courier ticket and send the print.</p>
+                                                                    <p className="text-gray-600">If unable to do so, please force a pickup from the user.</p>
+
+                                                                    <br />
+
+                                                                    <div className="flex flex-row gap-2 items-center justify-center">
+                                                                        <p className="bg-green-100 text-green-800 px-2 py-1 rounded-md w-fit cursor-pointer">Generate Courier Ticket</p>
+                                                                        <p 
+                                                                            onClick={() => {
+                                                                                if(isLoading) return;
+
+                                                                                setIsLoading(true)
+                                                                                fetch('/api/jobs/change-to-pickup', {
+                                                                                    method: "POST",
+                                                                                    body: JSON.stringify({ job_id: activePrint?.id })
+                                                                                }).then(b => {
+                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                        const data: Job[] = await val.json();
+                                                                                        setRawPrintList([...data]);
+                                                                                        setPrintList([...data]);
+                                                                                        setActivePrint(data?.at(0) ?? null);
+                                                                                        setIsLoading(false)
+                                                                                    });
+                                                                                })
+                                                                            }}
+                                                                            className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md w-fit cursor-pointer">Force Pickup</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    case JobStatus.READYFORPICKUP:
+                                                        return (
+                                                            <div className="flex flex-row items-start justify-center flex-1">
+                                                                <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                    <p className="text-gray-400">Order marked as <strong className="text-green-800">Ready for Pickup</strong></p>
+                                                                </div>
+                                                            </div>
+                                                        )
                                                     case JobStatus.PRINTING:
                                                         return (
                                                             <div className="flex flex-row items-start justify-center flex-1">

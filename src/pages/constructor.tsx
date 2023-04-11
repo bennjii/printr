@@ -63,16 +63,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         setIsNewInJobQueue(false)
     }, [activeMenu]);
 
-    // useEffect(() => {
-    //     const diff = rawPrintList.filter(element => !printList.includes(element));
-
-    //     if(diff.length > 0) {
-    //         setActivePrint(diff[0] ?? null)
-    //     }
-
-    //     setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
-    // }, [rawPrintList]);
-
     const [ config, setConfig ] = useState<PrintConfig>({ ...JSON.parse(JSON.stringify((DEFAULT_CONFIG))) });
     const [ isDragged, setIsDragged ] = useState(false);
     const [ canContinue, setCanContinue ] = useState(false);

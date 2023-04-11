@@ -10,8 +10,7 @@ import Button from '@components/un-ui/button';
 
 import { ArrowRight, Check, GitHub  } from 'react-feather';
 import { useRouter } from 'next/router';
-import { filter, uniqueId } from "lodash";
-import { randomUUID } from 'crypto';
+import { filter } from "lodash";
 
 export default function Home({ providers }: { providers: ClientSafeProvider[] }) {
     const [ authInformation, setAuthInformation ] = useState({
@@ -190,7 +189,7 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                                                 setPrinterList([...printerList, {
                                                                     model: modelVal,
                                                                     name: nameVal,
-                                                                    id: uniqueId()
+                                                                    id: (Math.random() * 10_000).toString()
                                                                 }]);
 
                                                                 setModelVal("")

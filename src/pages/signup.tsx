@@ -78,31 +78,31 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
         }
     }
 
-    const [ showConstructorViewer, setShowConstructorViewer ] = useState(false);
-    const [ cState, setCState ] = useState<0 | 1 | 2>(0);
+    // const [ showConstructorViewer, setShowConstructorViewer ] = useState(false);
+    // const [ cState, setCState ] = useState<0 | 1 | 2>(0);
 
-    const printer_name_ref = createRef<HTMLInputElement>();
-    const printer_model_ref = createRef<HTMLInputElement>();
+    // const printer_name_ref = createRef<HTMLInputElement>();
+    // const printer_model_ref = createRef<HTMLInputElement>();
 
-    const constructor_address_ref = createRef<HTMLInputElement>();
-    const constructor_name_ref = createRef<HTMLInputElement>();
+    // const constructor_address_ref = createRef<HTMLInputElement>();
+    // const constructor_name_ref = createRef<HTMLInputElement>();
 
-    const [ nameVal, setNameVal ] = useState("");
-    const [ modelVal, setModelVal ] = useState(""); 
+    // const [ nameVal, setNameVal ] = useState("");
+    // const [ modelVal, setModelVal ] = useState(""); 
 
-    const [ printerList, setPrinterList ] = useState<{
-        name: string,
-        model: string,
-        id: string
-    }[]>([]);
+    // const [ printerList, setPrinterList ] = useState<{
+    //     name: string,
+    //     model: string,
+    //     id: string
+    // }[]>([]);
 
-    const constructor = () => {
-        setShowConstructorViewer(true)
-    }
+    // const constructor = () => {
+    //     setShowConstructorViewer(true)
+    // }
 
     return (
             <div className="flex-col flex font-sans min-h-screen" > {/* style={{ background: 'linear-gradient(-45deg, rgba(99,85,164,0.2) 0%, rgba(232,154,62,.2) 100%)' }} */}
-                {
+                {/* {
                     showConstructorViewer ?
                     <div className="fixed h-full w-full bg-white z-40 flex flex-col p-32">
                         <div className={`flex fixed left-10 top-10 flex-row items-center gap-2 px-2 py-1 rounded-md cursor-pointer text-gray-600`}
@@ -123,7 +123,6 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                             <div className="flex flex-row items-center gap-4">
                                 <p className={`${cState == 0 ? "bg-blue-600 text-white" : "bg-gray-200"} rounded-full p-4 w-10 h-10 flex items-center justify-center font-semibold`}>1</p>
                                 <p className={`${cState == 1 ? "bg-blue-600 text-white" : "bg-gray-200"} rounded-full p-4 w-10 h-10 flex items-center justify-center font-semibold`}>2</p>
-                                {/* <p className={`${cState == 2 ? "bg-blue-600 text-white" : "bg-gray-200"} rounded-full p-4 w-10 h-10 flex items-center justify-center font-semibold`}>3</p> */}
                             </div>
                         </div>
 
@@ -294,7 +293,7 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                     </div>
                     :
                     <></>
-                }
+                } */}
                 
                 <div className="flex-col flex font-sans min-h-screen w-screen relative overflow-hidden">
                     <div id="gradient-canvas" className="md:top-0 w-full z-10 absolute h-screen  bg-blue-400" style={{ width: '200%', height: '200%', zIndex: 0 }} data-transition-in></div>
@@ -391,8 +390,9 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                         loaderOnly={awaitingReply}
                                         icon={authSuccess == "logged_in" ? <Check size={16}/> : <ArrowRight size={16} />}
                                         onClick={() => {
-                                            if(authInformation.request_constructor)  constructor()
-                                            else signIn()
+                                            // if(authInformation.request_constructor)  constructor()
+                                            // else 
+                                            signIn()
                                         }}>
                                         {
                                         authInformation.request_constructor ?

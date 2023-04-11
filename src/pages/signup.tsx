@@ -390,8 +390,10 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                         className=" bg-blue-600 text-slate-50 w-fit font-semibold text-sm"
                                         loaderOnly={awaitingReply}
                                         icon={authSuccess == "logged_in" ? <Check size={16}/> : <ArrowRight size={16} />}
-                                        onClick={() => authInformation.request_constructor ? constructor() : signIn()}
-                                        >
+                                        onClick={() => {
+                                            if(authInformation.request_constructor)  constructor()
+                                            else signIn()
+                                        }}>
                                         {
                                         authInformation.request_constructor ?
                                         "Continue"

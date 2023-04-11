@@ -33,7 +33,7 @@ export type ModSession = {
 }
 
 const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => {
-    const [ activePrint, setActivePrint ] = useState<Job | null>(DEFAULT_PRINT_JOBS[0] as any as Job);
+    const [ activePrint, setActivePrint ] = useState<Job | null>(null);
     const [ activeUser, setActiveUser ] = useState(auth.user as any as User);
 
     const [ printList, setPrintList ] = useState<Job[]>([]);

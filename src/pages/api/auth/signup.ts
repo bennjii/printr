@@ -39,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Hash password, and do same on signup end for identical comparison.
     const hashedPassword = await hashPassword(password);
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             email,
             name,
@@ -50,7 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
     });
 
-    res.status(201).json({ message: 'User Created Successfully' });
+    res.status(201).json({ message: 'User Created Successfully', uid: user.id });
 }
 
 export default handler;

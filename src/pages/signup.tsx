@@ -267,7 +267,7 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                 
                                             const data = await response.json();
 
-                                            fetch(`/api/constructor/create`, {
+                                            fetch(`/api/constructr/create`, {
                                                 method: "POST",
                                                 body: JSON.stringify({
                                                     name: constructor_name_ref.current?.value,

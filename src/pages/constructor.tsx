@@ -40,7 +40,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
             setActiveUser(data);
         });
 
-        fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+        fetch(`/api/jobs/`).then(async val => {
             const data: Job[] = await val.json();
             setRawPrintList(data);
             setPrintList(data);

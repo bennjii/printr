@@ -10,9 +10,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const t = new Date().getTime();
 
     const result = await prisma.job.findMany({
-        where: {
-            current_status: "BIDDING"
-        },
         include: {
             constructor: true,
             submitter: true,

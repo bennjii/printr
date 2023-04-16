@@ -154,7 +154,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                     const data = await val.json();
                                                     console.log("Bid", data);
     
-                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                    fetch(`/api/jobs`).then(async val => {
                                                         const data: Job[] = await val.json();
                                                         setRawPrintList([ ...data ]);
                                                         setPrintList([ ...data ]);
@@ -183,7 +183,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                     const data = await val.json();
                                                     console.log("Bid", data);
     
-                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                    fetch(`/api/jobs`).then(async val => {
                                                         const data: Job[] = await val.json();
                                                         setRawPrintList(data);
                                                         setPrintList(data);
@@ -465,7 +465,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         ...job
                                                                                     });
 
-                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                    fetch(`/api/jobs`).then(async val => {
                                                                                         const data: Job[] = await val.json();
                                                                                         setRawPrintList([...data]);
                                                                                         setPrintList([...data]);
@@ -528,7 +528,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     method: "POST",
                                                                                     body: JSON.stringify({ job_id: activePrint?.id })
                                                                                 }).then(b => {
-                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                    fetch(`/api/jobs`).then(async val => {
                                                                                         const data: Job[] = await val.json();
                                                                                         setRawPrintList([...data]);
                                                                                         setPrintList([...data]);
@@ -546,7 +546,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         return (
                                                             <div className="flex flex-row items-start justify-center flex-1">
                                                                 <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                                    <p className="text-gray-400">Order marked as <strong className="text-green-800">Ready for Pickup</strong></p>
+                                                                    <p className="text-gray-400">Order marked as <strong className="text-green-600">Ready for Pickup</strong></p>
+                                                                    <p
+                                                                        onClick={() => {
+                                                                            if(isLoading) return;
+                                                                            setIsLoading(true);
+
+                                                                            fetch(`/api/jobs/finish`, {
+                                                                                method: "POST",
+                                                                                body: JSON.stringify({ job_id: activePrint?.id })
+                                                                            }).then(b => {
+                                                                                setIsLoading(false);
+                                                                            })
+                                                                        }} 
+                                                                        className={`${isLoading ? "opacity-20" : ""}  text-green-800 bg-green-100 rounded-md px-2`}>Mark as Completed</p>
                                                                 </div>
                                                             </div>
                                                         )
@@ -573,7 +586,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     ...job
                                                                                 });
 
-                                                                                fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                fetch(`/api/jobs`).then(async val => {
                                                                                     const data: Job[] = await val.json();
                                                                                     setRawPrintList(data);
                                                                                     setPrintList(data);
@@ -627,7 +640,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         ...job
                                                                                     });
     
-                                                                                    fetch(`/api/jobs/user/${auth.id}`).then(async val => {
+                                                                                    fetch(`/api/jobs`).then(async val => {
                                                                                         const data: Job[] = await val.json();
                                                                                         setRawPrintList(data);
                                                                                         setPrintList(data);
@@ -691,8 +704,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
 export const  getServerSideProps: GetServerSideProps = async (context) => {
     const metaTags = {
 		"og:title": [`Upload. Print. Collect.`],
-		"og:description": ["Reseda boasts up to 1GB/s real world throughput, affordably pricing, and incredible security."],
-		"og:url": [`https://reseda.app/`],
+		"og:description": [""],
+		"og:url": [`https://printr.vercel.app/`],
 	};
 
     const session: ModSession | null = await getServerSession(context.req, context.res, authOptions);

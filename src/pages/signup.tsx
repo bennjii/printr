@@ -276,7 +276,7 @@ export default function Home({ providers }: { providers: ClientSafeProvider[] })
                                                     user_id: data.uid
                                                 })
                                             }).then(b => {
-                                                router.push('/constructor')
+                                                router.push('/constructr')
                                             })
                                         }
 

@@ -37,7 +37,7 @@ export const Header = ({ activeUser, currentPage }: {  activeUser: User, current
 
                 <div className={`${activeUser.is_constructor ? "bg-gray-100 px-4 pr-0 rounded-md" : ""} overflow-hidden flex flex-row items-center gap-4`}>
                     <a
-                        href={currentPage == "INDX" ? "./constructor" : "./"}
+                        href={currentPage == "INDX" ? "./constructr" : "./"}
                         className={`flex-row items-center gap-4 text-slate-800 cursor-pointer ${activeUser.is_constructor ? "flex" : "hidden"}`}>
                         <p>Switch to {currentPage == "INDX" ? "constructor" : "customer"} view</p>
                     </a>

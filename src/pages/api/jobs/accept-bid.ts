@@ -26,6 +26,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             current_status: "PREPRINT",
             printer_id: bid?.printer_id,
             constructor_id: bid?.printer.constructor_id
+        },
+        include: {
+            constructor: true,
+            submitter: true,
+            Bids: {
+                include: {
+                    bidder: true
+                }
+            }
         }
     });
 

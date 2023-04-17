@@ -467,15 +467,14 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 body: JSON.stringify(new_job)
                             }).then(b => {
                                 setCurrentJob(new_job);
-                                // setPrintList([ ...printList, new_job ]);
                                 setPrintMode(5);
                                 setWaiting(false);
 
                                 fetch(`/api/jobs/user/${user_id}`).then(async val => {
                                     const data: Job[] = await val.json();
-                                    setRawPrintList(data);
-                                    setPrintList(data);
-                                    setActivePrint(data?.at(0) ?? null);
+                                    setRawPrintList([ ...data ]);
+                                    setPrintList([ ...data ]);
+                                    setActivePrint(data.find(b => b.file_name == new_job.file_name));
                                 });
                             });
                         }else {

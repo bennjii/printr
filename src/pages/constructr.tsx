@@ -44,7 +44,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
             const data: Job[] = await val.json();
             setRawPrintList(data);
             setPrintList(data);
-            setActivePrint(data?.at(0) ?? null);
         });
 
         fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
@@ -158,7 +157,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         const data: Job[] = await val.json();
                                                         setRawPrintList([ ...data ]);
                                                         setPrintList([ ...data ]);
-                                                        setActivePrint(data?.at(0) ?? null);
+                                                        // setActivePrint({ ...activePrint });
                                                     });
                                             
                                                     fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
@@ -187,7 +186,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         const data: Job[] = await val.json();
                                                         setRawPrintList(data);
                                                         setPrintList(data);
-                                                        setActivePrint(data?.at(0) ?? null);
+                                                        // setActivePrint(data?.at(0) ?? null);
                                                     });
                                             
                                                     fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
@@ -252,7 +251,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                         {/* All of the prints in queue */}
                         {
                             printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).length > 0 ?
-                            printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) != 7 && job_status_to_type(k.current_status) != 0).filter(k => job_status_to_type(k.current_status) < 5).map(k => <JobElement key={`JOBELEM-${k.id}-${k.current_status}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                             :
                             <p className="w-full text-center text-gray-400 text-sm pt-4">No current active jobs</p>
                         }
@@ -262,7 +261,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                         <p className="text-gray-600">Inactive Jobs</p>
                         {
                             printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).length > 0 ? 
-                            printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
+                            printList.filter(k => job_status_to_type(k.current_status) != 7).filter(k => job_status_to_type(k.current_status) >= 5).map(k => <JobElement key={`JOBELEM-${k.id}-${k.current_status}`} k={k} setActivePrint={setActivePrint} setActiveMenu={setActiveMenu} />)
                             :
                             <p className="w-full text-center text-gray-400 text-sm pt-4">No current inactive jobs</p>
                         }
@@ -276,17 +275,37 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                 }
                             </div>
                             <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 2 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((2))}>Printer List</div>
-                            <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>Active Print - {activePrint?.job_name}</div>
+                            { 
+                                activePrint == null ? 
+                                <></> :  
+                                <div className={`flex flex-row items-center gap-2 px-4 py-2 rounded-t-md ${activeMenu == 1 ? "bg-gray-100" : "hover:bg-gray-100 cursor-pointer"}`} onClick={() => setActiveMenu((1))}>Active Print - {activePrint?.job_name}</div>
+                            }
                         </div>
 
                         <div className={`flex flex-col flex-1 bg-gray-100 rounded-b-md rounded-r-md ${activeMenu != 0 ? "rounded-l-md" : ""}`}>
                             {
                                 activeMenu == 0 ?
                                         <div className="flex flex-col gap-4 flex-1 p-12 flex-1 justify-start">
-                                            <div className="flex justify-start flex-col gap-4 place-start" >
+                                            <div className="flex justify-start flex-row items-center gap-4 place-start" >
                                                 <div className="flex flex-col">
                                                     <p className="font-bold text-xl">Job Queue</p>
                                                     <p className="text-gray-500">Place bids on new jobs to secure them</p>
+                                                </div>
+
+                                                <div
+                                                    onClick={() => {
+                                                        if(isLoading) return;
+
+                                                        setIsLoading(true)
+                                                        fetch(`/api/jobs/`).then(async val => {
+                                                            const data: Job[] = await val.json();
+                                                            setRawPrintList(data);
+                                                            setPrintList(data);
+                                                            setIsLoading(false);
+                                                        });
+                                                    }} 
+                                                    className={`${ isLoading ? "opacity-20" : "" } bg-gray-800 text-white px-2 py-1 rounded-md cursor-pointer`}>
+                                                    Refresh
                                                 </div>
                                             </div>
 
@@ -439,6 +458,11 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                 <div className="flex flex-col gap-4 flex-1 h-full">
                                                                     <p className="text-sm font-semibold">PRINT INFORMATION</p>
 
+                                                                    <div className="flex flex-row items-center gap-2">
+                                                                        <p className="font-bold">Notes from customer:</p>
+                                                                        <p>{activePrint?.notes}</p>
+                                                                    </div>
+
                                                                     <div className="flex flex-col items-start">
                                                                         <p className="text-gray-400 text-sm">CHOSEN PRINTER</p>
                                                                         <p>{activePrint?.printer_id}</p>
@@ -469,7 +493,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         const data: Job[] = await val.json();
                                                                                         setRawPrintList([...data]);
                                                                                         setPrintList([...data]);
-                                                                                        setActivePrint(data?.at(0) ?? null);
                                                                                     });
                                                                             
                                                                                     fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
@@ -524,18 +547,20 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                 if(isLoading) return;
 
                                                                                 setIsLoading(true)
-                                                                                fetch('/api/jobs/change-to-pickup', {
-                                                                                    method: "POST",
-                                                                                    body: JSON.stringify({ job_id: activePrint?.id })
-                                                                                }).then(b => {
-                                                                                    fetch(`/api/jobs`).then(async val => {
-                                                                                        const data: Job[] = await val.json();
-                                                                                        setRawPrintList([...data]);
-                                                                                        setPrintList([...data]);
-                                                                                        setActivePrint(data?.at(0) ?? null);
-                                                                                        setIsLoading(false)
-                                                                                    });
-                                                                                })
+                                                                                if(activePrint)
+                                                                                    fetch('/api/jobs/change-to-pickup', {
+                                                                                        method: "POST",
+                                                                                        body: JSON.stringify({ job_id: activePrint?.id })
+                                                                                    }).then(b => {
+                                                                                        fetch(`/api/jobs`).then(async val => {
+                                                                                            const data: Job[] = await val.json();
+                                                                                            setRawPrintList([...data]);
+                                                                                            setPrintList([...data]);
+                                                                                            setActivePrint({ ...activePrint, current_status: "READYFORPICKUP" })
+                                                                                            // setActivePrint(data?.at(0) ?? null);
+                                                                                            setIsLoading(false)
+                                                                                        });
+                                                                                    })
                                                                             }}
                                                                             className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md w-fit cursor-pointer">Force Pickup</p>
                                                                     </div>
@@ -555,11 +580,21 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                             fetch(`/api/jobs/finish`, {
                                                                                 method: "POST",
                                                                                 body: JSON.stringify({ job_id: activePrint?.id })
-                                                                            }).then(b => {
+                                                                            }).then(async b => {
+                                                                                const job = await b.json();
                                                                                 setIsLoading(false);
+                                                                                setActivePrint({
+                                                                                    ...job.job
+                                                                                });
+
+                                                                                fetch(`/api/jobs`).then(async val => {
+                                                                                    const data: Job[] = await val.json();
+                                                                                    setRawPrintList(data);
+                                                                                    setPrintList(data);
+                                                                                });
                                                                             })
                                                                         }} 
-                                                                        className={`${isLoading ? "opacity-20" : ""}  text-green-800 bg-green-100 rounded-md px-2`}>Mark as Completed</p>
+                                                                        className={`${isLoading ? "opacity-20" : ""}  text-green-800 bg-green-100 rounded-md px-2 cursor-pointer`}>Mark as Completed</p>
                                                                 </div>
                                                             </div>
                                                         )
@@ -590,7 +625,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     const data: Job[] = await val.json();
                                                                                     setRawPrintList(data);
                                                                                     setPrintList(data);
-                                                                                    setActivePrint(data?.at(0) ?? null);
                                                                                 });
                                                                         
                                                                                 fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
@@ -613,6 +647,10 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         return (
                                                             <div className="flex flex-row items-start justify-center flex-1">
                                                                 <div className="flex flex-col gap-2 flex-1 h-full">
+                                                                    <div className="flex flex-row items-center gap-2">
+                                                                        <p className="font-bold">Notes from customer:</p>
+                                                                        <p>{activePrint?.notes}</p>
+                                                                    </div>
                                                                     <div className="flex flex-row items-center justify-between gap-4">
                                                                         <p>You must <strong>scan</strong> and <strong>take photos</strong> of the print to send to the customer.</p>
                                                                         
@@ -644,7 +682,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         const data: Job[] = await val.json();
                                                                                         setRawPrintList(data);
                                                                                         setPrintList(data);
-                                                                                        setActivePrint(data?.at(0) ?? null);
                                                                                     });
                                                                             
                                                                                     fetch(`/api/printers/constructor/${auth.id}`).then(async val => {

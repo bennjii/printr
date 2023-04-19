@@ -46,7 +46,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
             setPrintList(data);
         });
 
-        fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+        fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
             const data: Printer[] = await val.json();
             setPrinters(data);
         });
@@ -160,7 +160,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         // setActivePrint({ ...activePrint });
                                                     });
                                             
-                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                    fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
                                                         const data: Printer[] = await val.json();
                                                         setPrinters([ ...data ]);
                                                     });
@@ -189,7 +189,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         // setActivePrint(data?.at(0) ?? null);
                                                     });
                                             
-                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                    fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
                                                         const data: Printer[] = await val.json();
                                                         setPrinters(data);
                                                     });
@@ -495,7 +495,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         setPrintList([...data]);
                                                                                     });
                                                                             
-                                                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                    fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
                                                                                         const data: Printer[] = await val.json();
                                                                                         setPrinters(data);
                                                                                     });
@@ -627,7 +627,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                     setPrintList(data);
                                                                                 });
                                                                         
-                                                                                fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
                                                                                     const data: Printer[] = await val.json();
                                                                                     setPrinters(data);
                                                                                 });
@@ -684,7 +684,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                                         setPrintList(data);
                                                                                     });
                                                                             
-                                                                                    fetch(`/api/printers/constructor/${auth.id}`).then(async val => {
+                                                                                    fetch(`/api/printers/constructr/${auth.id}`).then(async val => {
                                                                                         const data: Printer[] = await val.json();
                                                                                         setPrinters(data);
                                                                                     });

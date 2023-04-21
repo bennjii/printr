@@ -13,11 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         include: {
             constructor: true,
             submitter: true,
-            Bids: {
-                include: {
-                    bidder: true
-                }
-            }
+            Bids: true
         }
     });
 

@@ -17,13 +17,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
     });
 
-    printers.map((p: {name: string, model: string}) => {
-        prisma.printer.create({
+    printers.map(async (p: {name: string, model: string}) => {
+        const d = await prisma.printer.create({
             data: {
-                name: p.name,
-                model: p.model
+                name: p.name ?? "",
+                model: p.model ?? "",
+                constructor_id: constructor.id
             }
-        })
+        });
+
+        console.log(d);
     })
 
     res.status(200).json({ 

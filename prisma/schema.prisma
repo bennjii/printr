@@ -8,6 +8,8 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  relationMode = "prisma"
 }
 
 enum JobStatus {
@@ -82,6 +84,8 @@ model Printer {
 
   constructor    Constructor @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
   constructor_id String
+
+  @@index([constructor_id])
 }
 
 model PrinterMetadata {
@@ -90,6 +94,8 @@ model PrinterMetadata {
 
   constructor    Constructor @relation(fields: [constructor_id], references: [id], onDelete: Cascade)
   constructor_id String
+
+  @@index([constructor_id])
 }
 
 model Job {
@@ -122,6 +128,10 @@ model Job {
   JobMetadata    JobMetadata?
   BidMetadata    BidMetadata[]
   Bids           Bid[]
+
+  @@index([constructor_id])
+  @@index([printer_id])
+  @@index([submitter_id])
 }
 
 model JobMetadata {
@@ -136,6 +146,10 @@ model JobMetadata {
 
   submitter    User   @relation(fields: [submitter_id], references: [id], onDelete: Cascade)
   submitter_id String 
+
+  @@index([constructor_id])
+  @@index([printer_id])
+  @@index([submitter_id])
 }
 
 model Bid {
@@ -155,6 +169,10 @@ model Bid {
 
   price       Float
   BidMetadata BidMetadata?
+
+  @@index([bidder_id])
+  @@index([job_id])
+  @@index([printer_id])
 }
 
 model BidMetadata {
@@ -166,4 +184,7 @@ model BidMetadata {
 
   bidder    User   @relation(fields: [bidder_id], references: [id], onDelete: Cascade)
   bidder_id String
+
+  @@index([job_id])
+  @@index([bidder_id])
 }

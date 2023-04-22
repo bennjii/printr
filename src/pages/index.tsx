@@ -296,6 +296,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                             </div>
                                                         </div>
                                                     )
+                                            case JobStatus.PRINTING:
+                                                    return (
+                                                        <div className="flex flex-row items-start justify-center flex-1">
+                                                            <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
+                                                                <p className="text-gray-400">Your print is being printed, please wait for it to be completed!</p>
+                                                            </div>
+                                                        </div>
+                                                    )
                                             case JobStatus.BIDDING:
                                                 return (
                                                     <div className="flex flex-row items-start justify-center flex-1 gap-4">

@@ -1,7 +1,7 @@
 import {GetServerSideProps, type NextPage} from "next";
 import {createRef, useEffect, useState} from "react";
 import {PrintStart} from "../../public/components/print";
-import {DEFAULT_PRINT_JOBS, DEFAULT_USER} from "../../public/lib/helpers";
+import {DEFAULT_PRINT_JOBS, DEFAULT_USER, FIXED_PRINTER_OPTIONS} from "../../public/lib/helpers";
 import {History, job_status_to_colour_pair, job_status_to_string, job_status_to_type, JobStatus, PrintConfig} from "../../public/lib/printr";
 import {Header} from "../../public/components/header";
 import {JobElement} from "../../public/components/job";
@@ -11,6 +11,7 @@ import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../server/auth";
 import { Bid, Job, User } from "@prisma/client";
+import { Map } from "@components/map";
 
 export type ModSession = {
     user: {
@@ -304,6 +305,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                             </div>
                                                         </div>
                                                     )
+                                            case JobStatus.READYFORPICKUP:
+                                                return (
+                                                    <div className="flex flex-row items-start justify-center flex-1">
+                                                        <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full rounded-md overflow-hidden">
+                                                            <Map constructors={FIXED_PRINTER_OPTIONS} />
+                                                        </div>
+                                                    </div>
+                                                )
                                             case JobStatus.BIDDING:
                                                 return (
                                                     <div className="flex flex-row items-start justify-center flex-1 gap-4">

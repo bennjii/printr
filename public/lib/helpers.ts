@@ -130,18 +130,18 @@ export const FIXED_PRINTER_OPTIONS: MinifiedConstructor[] = [
         completeness_level: Completeness.Absolute,
         id: "q39h29j21w0918h81g"
     },
-    {
-        name: "Central 3D Printers",
-        location: to_latlon([151.2069986455657, -33.863668189634026]),
-        completeness_level: Completeness.Absolute,
-        id: "bnja991gb910tub2ag"
-    },
-    {
-        name: "Jackson House 3D",
-        location: to_latlon([151.16657477539488, -33.88951988211027]),
-        completeness_level: Completeness.Partial,
-        id: "g240b40t2083g49293"
-    }
+    // {
+    //     name: "Central 3D Printers",
+    //     location: to_latlon([151.2069986455657, -33.863668189634026]),
+    //     completeness_level: Completeness.Absolute,
+    //     id: "bnja991gb910tub2ag"
+    // },
+    // {
+    //     name: "Jackson House 3D",
+    //     location: to_latlon([151.16657477539488, -33.88951988211027]),
+    //     completeness_level: Completeness.Partial,
+    //     id: "g240b40t2083g49293"
+    // }
 ];
 
 export const DEFAULT_CONFIG = {

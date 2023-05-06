@@ -6,6 +6,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return;
 
     const {
+        id,
+
         current_status,
         status_history,
 
@@ -21,6 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const job = await prisma.job.create({ 
         data: {
+            id: id,
             current_status,
             status_history: status_history as Prisma.InputJsonValue,
             estimated_completion,

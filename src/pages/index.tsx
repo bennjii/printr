@@ -60,17 +60,6 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         });
     }, [])
 
-    // useEffect(() => {
-    //     const diff = rawPrintList.filter(element => !printList.includes(element));
-
-    //     if(diff.length > 0) {
-    //         //@ts-ignore
-    //         setActivePrint(diff[0])
-    //     }
-
-    //     setPrintList([ ...rawPrintList.sort((a, b) => job_status_to_type(a.current_status) - job_status_to_type(b.current_status)) ])
-    // }, [rawPrintList]);
-
     return (
             <div className="flex flex-col min-w-screen w-full min-h-screen h-full">
                 <Header activeUser={activeUser} currentPage="INDX" />

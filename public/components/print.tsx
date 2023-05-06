@@ -16,6 +16,8 @@ import {
 
 import { Job, Job as JobDBType } from "@prisma/client"
 import prisma from "@public/lib/prisma";
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { s3Client } from "@public/lib/s3";
 
 export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrintList, setActivePrint, printList, user_id }:  { activeMenu: number, setActiveMenu: Function, setRawPrintList: Function, setActivePrint: Function, setPrintList: Function, printList: Job[], user_id: string }) => {
     const [ print_mode, setPrintMode ] = useState<0 | 1 | 2 | 4 | 5 | 6>(0);
@@ -436,7 +438,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                             setWaiting(true);
 
                             const new_job: JobDBType = {
-                                id: (Math.random() * 10000).toString(),
+                                id: Math.round(Math.random() * 10000000).toString(),
 
                                 created_at: new Date(),
                                 updated_at: new Date(),
@@ -462,21 +464,56 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 notes: ""
                             };
 
-                            fetch(`/api/jobs/create`, {
-                                method: "POST",
-                                body: JSON.stringify(new_job)
-                            }).then(b => {
-                                setCurrentJob(new_job);
-                                setPrintMode(5);
-                                setWaiting(false);
+                            const extension = config.files[0]?.name.split('.') ?? [];
+                            const fkey = `user-uploads/${user_id}-${new_job.id}.${extension[(extension?.length ?? 1) -1]}`;                            
 
-                                fetch(`/api/jobs/user/${user_id}`).then(async val => {
-                                    const data: Job[] = await val.json();
-                                    setRawPrintList([ ...data ]);
-                                    setPrintList([ ...data ]);
-                                    setActivePrint(data.find(b => b.file_name == new_job.file_name));
+                            const params = {
+                                Bucket: "printr", // The path to the directory you want to upload the object to, starting with your Space name.
+                                Key: 'hello-world.txt', // Object key, referenced whenever you want to access this file later.
+                                Body: "Hello, World!", // The object's contents. This variable is an object, not a string.
+                                ACL: "private", // Defines ACL permissions, such as private or public.
+                                Metadata: { // Defines metadata tags.
+                                  "job-id": new_job.id,
+                                  "user-id": user_id
+                                }
+                            };
+
+                            const uploadObject = async () => {
+                                try {
+                                    const data = await s3Client.send(new PutObjectCommand(params));
+                                    console.log(
+                                        "Successfully uploaded object: " +
+                                        params.Bucket +
+                                        "/" +
+                                        params.Key
+                                    );
+                                    return data;
+                                } catch (err) {
+                                    console.log("Error", err);
+                                }   
+                            };
+
+                            uploadObject().then(res => {
+                                // https://printr.syd1.digitaloceanspaces.com
+                                const url = `https://${"printr"}.syd1.digitaloceanspaces.com/${fkey}`
+                                new_job.file_url = url;
+
+                                fetch(`/api/jobs/create`, {
+                                    method: "POST",
+                                    body: JSON.stringify(new_job)
+                                }).then(b => {
+                                    setCurrentJob(new_job);
+                                    setPrintMode(5);
+                                    setWaiting(false);
+    
+                                    fetch(`/api/jobs/user/${user_id}`).then(async val => {
+                                        const data: Job[] = await val.json();
+                                        setRawPrintList([ ...data ]);
+                                        setPrintList([ ...data ]);
+                                        setActivePrint(data.find(b => b.file_name == new_job.file_name));
+                                    });
                                 });
-                            });
+                            })
                         }else {
                             setPrintMode(print_mode > 4 ? 5 as typeof print_mode : (print_mode == 1 && config.delivery.method != "Delivery") ? 4 : print_mode == 2 && can_continue ? 4 : can_continue ? print_mode+1 as typeof print_mode : print_mode as typeof print_mode)
                         }

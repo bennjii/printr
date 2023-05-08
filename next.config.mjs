@@ -12,7 +12,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["cdn.thingiverse.com"]
+    domains: ["cdn.thingiverse.com", "printr.syd1.digitaloceanspaces.com"]
   },
   eslint: {
     ignoreDuringBuilds: true,

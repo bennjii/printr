@@ -9,6 +9,8 @@ import { ModSession } from ".";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../server/auth";
 import Image from "next/image";
+import { s3Client } from "@public/lib/s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: { auth: ModSession, metaTags: any }) => {
     const [ activePrint, setActivePrint ] = useState<Job | null>(null);
@@ -80,7 +82,7 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
         setIsDragged(false);
 
         const f_l = config.files;
-        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "" });
+        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "", file: files[0] });
 
         setConfig({ ...config, files: f_l })
         setCanContinue(true);
@@ -323,7 +325,10 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                         <p className="text-sm text-gray-400">{(k.job_preferences as any as PrintConfig).filament.name}</p>
 
                                                                         <div className="flex flex-col gap-2">
-                                                                        <p className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md">Download File</p>
+                                                                        <a 
+                                                                            href={k.file_url}
+                                                                            className="text-sm text-center cursor-pointer font-semibold bg-gray-100 rounded-md"
+                                                                            >Download File</a>
                                                                         {
                                                                             //@ts-ignore
                                                                             k.Bids?.filter((k: Bid) => k.bidder_id == auth.id).length > 0 ?
@@ -663,14 +668,47 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                                         </div>
 
                                                                         <div 
-                                                                            onClick={() => {
+                                                                            onClick={async () => {
                                                                                 if(isLoading) return;
+
+                                                                                const extension = config.files[0]?.name.split('.') ?? [];
+                                                                                const fkey = `user-uploads/${activePrint?.id}-evidence.${extension[(extension?.length ?? 1) -1]}`;                            
+
+                                                                                const params = {
+                                                                                    Bucket: "printr", // The path to the directory you want to upload the object to, starting with your Space name.
+                                                                                    Key: fkey, // Object key, referenced whenever you want to access this file later.
+                                                                                    Body: config.files[0]?.file, // The object's contents. This variable is an object, not a string.
+                                                                                    ACL: "public-read", // Defines ACL permissions, such as private or public.
+                                                                                    Metadata: { // Defines metadata tags.
+                                                                                        "job-id": activePrint?.id ?? "",
+                                                                                        "user-id": activeUser.id
+                                                                                    },
+                                                                                };
+
+                                                                                const uploadObject = async () => {
+                                                                                    try {
+                                                                                        const data = await s3Client.send(new PutObjectCommand(params));
+                                                                                        console.log(
+                                                                                            "Successfully uploaded object: " +
+                                                                                            params.Bucket +
+                                                                                            "/" +
+                                                                                            params.Key
+                                                                                        );
+                                                                                        return data;
+                                                                                    } catch (err) {
+                                                                                        console.log("Error", err);
+                                                                                    }   
+                                                                                };
+
+                                                                                await uploadObject()
+                                                                                const url = `https://${"printr"}.syd1.digitaloceanspaces.com/${fkey}`
 
                                                                                 setIsLoading(true);
                                                                                 fetch(`api/jobs/submit-evidence`, {   
                                                                                     method: "POST",
                                                                                     body: JSON.stringify({
-                                                                                        job_id: activePrint?.id ?? ""
+                                                                                        job_id: activePrint?.id ?? "",
+                                                                                        photo_url: url
                                                                                     })
                                                                                 }).then(async data => {
                                                                                     const { job, printer }: { job: Job, printer: Printer } = await data.json();

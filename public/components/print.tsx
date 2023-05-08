@@ -41,7 +41,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
         setIsDragged(false);
 
         const f_l = config.files;
-        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "" });
+        f_l.push({ name: files.item(0)?.name ?? "", size: files.item(0)?.size ?? 0, url: "", file: files[0] });
 
         setConfig({ ...config, files: f_l })
         setCanContinue(true);
@@ -53,7 +53,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                     switch(print_mode) {
                     case 0:
                         return (
-                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
+                                <div className="flex flex-col gap-4 flex-1 p-12">
                                     <div className="flex justify-start flex-col gap-4 place-start flex-1" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">To start, upload a file</p>
@@ -204,7 +204,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 )
                     case 2:
                         return (
-                                <div className="flex flex-col gap-8 flex-1 p-12 flex-1 flex-start">
+                                <div className="flex flex-col gap-8 flex-1 p-12 flex-start">
                                     <div className="flex flex-col justify-start gap-4 place-start flex-start" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">Print Checking</p>
@@ -231,7 +231,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
 
                     case 4:
                         return (
-                                <div className="flex flex-col gap-8 flex-1 p-12 flex-1 flex-start">
+                                <div className="flex flex-col gap-8 flex-1 p-12 flex-start">
                                     <div className="flex flex-col justify-start gap-4 place-start flex-start" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">Confirm Order</p>
@@ -340,7 +340,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 )
                     case 5:
                         return (
-                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
+                                <div className="flex flex-col gap-4 flex-1 p-12">
                                     <div className="flex justify-start flex-col gap-4 place-start flex-1" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">Order Placed!</p>
@@ -363,7 +363,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 )
                     case 6:
                         return (
-                                <div className="flex flex-col gap-4 flex-1 p-12 flex-1">
+                                <div className="flex flex-col gap-4 flex-1 p-12">
                                     <div className="flex justify-start flex-col gap-4 place-start flex-1" >
                                         <div className="flex flex-col">
                                             <p className="font-bold text-xl">Pick Printer</p>
@@ -452,6 +452,7 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
                                 ],
 
                                 estimated_completion: "",
+                                evidence: "",
 
                                 file_url: "https://s3.us-west-2.amazonaws.com/printr/nose_cone.obj",
                                 file_name: config.files.map(k => k.name).join(', '),
@@ -469,13 +470,13 @@ export const PrintStart = ({ activeMenu, setActiveMenu, setPrintList, setRawPrin
 
                             const params = {
                                 Bucket: "printr", // The path to the directory you want to upload the object to, starting with your Space name.
-                                Key: 'hello-world.txt', // Object key, referenced whenever you want to access this file later.
-                                Body: "Hello, World!", // The object's contents. This variable is an object, not a string.
-                                ACL: "private", // Defines ACL permissions, such as private or public.
+                                Key: fkey, // Object key, referenced whenever you want to access this file later.
+                                Body: config.files[0]?.file, // The object's contents. This variable is an object, not a string.
+                                ACL: "public-read", // Defines ACL permissions, such as private or public.
                                 Metadata: { // Defines metadata tags.
                                   "job-id": new_job.id,
                                   "user-id": user_id
-                                }
+                                },
                             };
 
                             const uploadObject = async () => {

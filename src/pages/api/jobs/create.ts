@@ -16,6 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         file_url,
         file_name,
         job_name,
+        evidence,
 
         job_preferences,
         submitter_id,
@@ -29,6 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             estimated_completion,
             file_url,
             file_name,
+            evidence,
             job_name,
             job_preferences: job_preferences as Prisma.InputJsonValue,
             submitter: {

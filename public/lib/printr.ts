@@ -196,7 +196,8 @@ export type Pending = null;
 export type File = {
     name: string,
     size: number,
-    url: string
+    url: string,
+    file: any
 }
 
 export type PrintConfig = {

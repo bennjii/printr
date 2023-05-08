@@ -7,6 +7,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const {
         job_id,
+        photo_url
     } = JSON.parse(req.body);
 
     const pref = await prisma.job.findUnique({
@@ -25,7 +26,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             },
             data: {
                 //@ts-ignore
-                current_status: pref?.job_preferences?.delivery?.method == "Pickup" ? "READYFORPICKUP" : "ENROUTE"
+                current_status: pref?.job_preferences?.delivery?.method == "Pickup" ? "READYFORPICKUP" : "ENROUTE",
+                evidence: photo_url
             }
         });
 
@@ -36,7 +38,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 id: job_id
             },
             data: {
-                current_status: "REVIEW"
+                current_status: "REVIEW",
+                evidence: photo_url
             }
         });
 

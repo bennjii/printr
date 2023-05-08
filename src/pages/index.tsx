@@ -183,7 +183,8 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                 return (
                                                     <div className="flex flex-row items-start justify-center flex-1">
                                                         <div className="flex flex-col gap-2 items-center justify-center flex-1 h-full">
-                                                            <div className="flex flex-1 items-center justify-center">EVIDENCE</div>
+                                                            <Image src={activePrint?.evidence ?? ""} height={400} width={400} alt=""></Image>
+                                                            {/* <div className="flex flex-1 items-center justify-center">{}</div> */}
                                                             <input ref={message_ref} placeholder="Notes regarding your decision" className="px-4 py-2 rounded-md w-full" onChange={(e) => {
                                                                     // setConfig({ ...config, message: e.target.value });
                                                                 }}></input>

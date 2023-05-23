@@ -152,6 +152,14 @@ const Home: NextPage<{ auth: ModSession, metaTags: any }> = ({auth, metaTags}: {
                                                         offer_value: offerModal.value
                                                     })
                                                 }).then(async val => {
+                                                    if(!val.ok) {
+                                                        alert("Cannot assign no printer to bid.");
+                                                        setIsLoading(false)
+                                                        setOfferModal({ ...offerModal, active: false })
+                                                        
+                                                        return
+                                                    };
+
                                                     const data = await val.json();
                                                     console.log("Bid", data);
     

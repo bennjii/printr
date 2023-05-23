@@ -7,6 +7,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { user_id, job_id, offer_value, printer_id } = JSON.parse(req.body);
     console.log({ user_id, job_id, offer_value, printer_id }, req.body, JSON.parse(req.body));
 
+    if(printer_id == "" || printer_id == null || printer_id == undefined) {
+        res.status(400).json({ 
+            error: "Printer ID not provided"
+        });
+
+        return
+    }
+
     const bid = await prisma.bid.create({ 
         data: {
             bidder_id: user_id,
@@ -24,14 +32,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             current_status: 'UNAVALIABLE'
         }
     })
-
-    // const bidMetadata = await prisma.bidMetadata.create({ 
-    //     data: {
-    //         bid_id: bid.id,
-    //         bidder_id: user_id,
-    //         job_id: job_id
-    //     }
-    // })
 
     res.status(200).json({ 
         bid, printer
